@@ -28,3 +28,4 @@ If you are using VS Code:
 - **Premium Design**: Custom CSS with glassmorphism and neon effects.
 - **Responsive**: Works on mobile and desktop.
 - **No Dependencies**: Pure HTML, CSS, and JS.
+

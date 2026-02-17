@@ -1,0 +1,350 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block main_class %}{% endblock %}
+
+{% block content %}
+<style>
+    /* Force remove gap on home page */
+    main {
+        padding-top: 0 !important;
+        margin-top: -20px !important;
+        /* Pull main up to cover any gap */
+        position: relative;
+        z-index: 0;
+    }
+
+    #home,
+    .hero-section {
+        margin-top: -55px !important;
+        /* Combine margin and previous top offset */
+        padding-top: 0 !important;
+        position: relative;
+        z-index: 1;
+        /* background-color removal for light theme */
+    }
+
+    /* Site Star Rating - EventNest Style */
+    .site-star-rating {
+        color: #ddd;
+    }
+
+    .site-star-rating input {
+        display: none !important;
+    }
+
+    .site-star-rating label {
+        cursor: pointer;
+        transition: color 0.2s;
+        color: #ddd;
+    }
+
+    .site-star-rating label:hover,
+    .site-star-rating label:hover~label,
+    .site-star-rating input:checked~label {
+        color: #ffc107;
+    }
+
+    .site-star-rating label:hover i,
+    .site-star-rating label:hover~label i,
+    .site-star-rating input:checked~label i {
+        font-weight: 900;
+    }
+</style>
+<!-- Hero Section (Carousel) -->
+<section id="home" class="p-0">
+    <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="4000">
+        <!-- Indicators -->
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active"></button>
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"></button>
+        </div>
+
+        <!-- Slides -->
+        <div class="carousel-inner">
+            <!-- Slide 1: Grand Event -->
+            <div class="carousel-item active carousel-item-custom">
+                <div class="overlay carousel-overlay carousel-overlay-dark"></div>
+                <img src="https://images.unsplash.com/photo-1511578314322-379afb476865?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80"
+                    class="d-block w-100 h-100 carousel-img-cover" alt="Grand Event">
+                <div class="carousel-caption d-none d-md-block text-start mb-5 pb-5 carousel-caption-custom">
+                    <h5 class="text-ocean-blue text-uppercase letter-spacing-2 fw-bold">Make It Memorable</h5>
+                    <h1 class="display-3 fw-bold text-navy mb-4">Crafting Unforgettable <br>Experiences</h1>
+                    <p class="lead text-navy-50 mb-4" style="max-width: 600px;">
+                        From corporate galas to intimate weddings, we transform your vision into reality with precision
+                        and style.
+                    </p>
+                    <a href="html/events.html" class="btn btn-ocean btn-lg rounded-pill">Explore Events</a>
+                </div>
+            </div>
+            <!-- Slide 2: Corporate Events -->
+            <div class="carousel-item carousel-item-custom">
+                <div class="overlay carousel-overlay carousel-overlay-dark"></div>
+                <img src="https://images.unsplash.com/photo-1515187029135-18ee286d815b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80"
+                    class="d-block w-100 h-100 carousel-img-cover" alt="Corporate Event">
+                <div class="carousel-caption d-none d-md-block text-start mb-5 pb-5 carousel-caption-custom">
+                    <h5 class="text-ocean-blue text-uppercase letter-spacing-2 fw-bold">Professional Excellence</h5>
+                    <h1 class="display-3 fw-bold text-navy mb-4">Corporate Events <br>Redefined</h1>
+                    <p class="lead text-navy-50 mb-4" style="max-width: 600px;">
+                        Impress clients and motivate teams with our high-impact conferences and retreats.
+                    </p>
+                    <a href="html/custom_event.html" class="btn btn-ocean btn-lg rounded-pill">Plan Corporate</a>
+                </div>
+            </div>
+            <!-- Slide 3: Live Concerts -->
+            <div class="carousel-item carousel-item-custom">
+                <div class="overlay carousel-overlay carousel-overlay-dark"></div>
+                <img src="https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80"
+                    class="d-block w-100 h-100 carousel-img-cover" alt="Live Concert">
+                <div class="carousel-caption d-none d-md-block text-start mb-5 pb-5 carousel-caption-custom">
+                    <h5 class="text-ocean-blue text-uppercase letter-spacing-2 fw-bold">Live Entertainment</h5>
+                    <h1 class="display-3 fw-bold text-navy mb-4">Electrifying <br>Performances</h1>
+                    <p class="lead text-navy-50 mb-4" style="max-width: 600px;">
+                        Stage design, sound engineering, and crowd management for world-class shows.
+                    </p>
+                    <a href="html/events.html" class="btn btn-ocean btn-lg rounded-pill">View Concerts</a>
+                </div>
+            </div>
+        </div>
+        <!-- Controls -->
+        <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+</section>
+
+<!-- Services Section -->
+<section id="services" class="py-5 bg-white">
+    <div class="container py-5">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h5 class="text-ocean-blue text-uppercase fw-bold">Our Services</h5>
+            <h2 class="display-5 fw-bold text-navy">Everything You Need</h2>
+        </div>
+        <div class="row g-4">
+            <!-- Service 1 -->
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="service-card text-center">
+                    <div class="service-icon">
+                        <i class="fas fa-glass-cheers"></i>
+                    </div>
+                    <h4>Weddings</h4>
+                    <p class="text-muted">From intimate ceremonies to grand receptions, we make your special day
+                        perfect.</p>
+                </div>
+            </div>
+            <!-- Service 2 -->
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="service-card text-center">
+                    <div class="service-icon">
+                        <i class="fas fa-briefcase"></i>
+                    </div>
+                    <h4>Corporate Events</h4>
+                    <p class="text-muted">Conferences, seminars, and product launches managed with professional
+                        precision.</p>
+                </div>
+            </div>
+            <!-- Service 3 -->
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+                <div class="service-card text-center">
+                    <div class="service-icon">
+                        <i class="fas fa-music"></i>
+                    </div>
+                    <h4>Concerts & Live Shows</h4>
+                    <p class="text-muted">Full-scale production for music festivals and live entertainment events.</p>
+                </div>
+            </div>
+
+            <!-- Service 4: Birthdays -->
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="400">
+                <div class="service-card text-center">
+                    <div class="service-icon">
+                        <i class="fas fa-birthday-cake"></i>
+                    </div>
+                    <h4>Birthday Bashes</h4>
+                    <p class="text-muted">Celebrate another year of joy with personalized themes and fun activities.</p>
+                </div>
+            </div>
+
+            <!-- Service 5: Exhibitions -->
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="500">
+                <div class="service-card text-center">
+                    <div class="service-icon">
+                        <i class="fas fa-palette"></i>
+                    </div>
+                    <h4>Exhibitions</h4>
+                    <p class="text-muted">Showcase your art or products in spaces designed to captivate your audience.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Service 6: Catering -->
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="600">
+                <div class="service-card text-center">
+                    <div class="service-icon">
+                        <i class="fas fa-utensils"></i>
+                    </div>
+                    <h4>Premium Catering</h4>
+                    <p class="text-muted">Exquisite culinary experiences tailored to your event's specific tastes.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+<!-- Testimonials Section -->
+<section id="testimonials" class="py-5 bg-navy text-white">
+    <div class="container py-5">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h5 class="text-ocean-blue text-uppercase fw-bold">Testimonials</h5>
+            <h2 class="display-4 fw-bold">What Our Clients Say</h2>
+        </div>
+        <div id="testimonialCarousel" class="carousel slide" data-bs-ride="carousel" data-aos="fade-up"
+            data-aos-delay="200">
+            <div class="carousel-inner text-center">
+                <div class="carousel-item active">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-8">
+                            <img src="https://randomuser.me/api/portraits/women/44.jpg"
+                                class="rounded-circle mb-4 border border-3 border-ocean-blue testimonial-img"
+                                alt="Client">
+                            <p class="lead mb-4 fw-light fst-italic">"Absolutely phenomenal service! The team at
+                                EventNest handled our wedding with such grace. Every detail was perfect."</p>
+                            <h5 class="mb-1 text-ocean-blue">Sarah Jenkins</h5>
+                            <span class="small text-silver-gray">Wedding Client</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-8">
+                            <img src="https://randomuser.me/api/portraits/men/32.jpg"
+                                class="rounded-circle mb-4 border border-3 border-ocean-blue testimonial-img"
+                                alt="Client">
+                            <p class="lead mb-4 fw-light fst-italic">"Our annual corporate gala was a massive success
+                                thanks to their professional planning. Highly recommended."</p>
+                            <h5 class="mb-1 text-ocean-blue">Michael Ross</h5>
+                            <span class="small text-silver-gray">CEO, TechCorp</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#testimonialCarousel"
+                data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#testimonialCarousel"
+                data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+
+        <!-- Give Review Button -->
+        <div class="text-center mt-5" data-aos="fade-up">
+            <button type="button" class="btn btn-outline-ocean-blue rounded-pill px-5 py-3 fw-bold shadow-sm"
+                data-bs-toggle="modal" data-bs-target="#siteReviewModal">
+                <i class="fas fa-star me-2"></i> Give Your Review
+            </button>
+        </div>
+
+        <!-- Site Review Modal -->
+        <div class="modal fade" id="siteReviewModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 rounded-4 shadow-lg text-dark text-start">
+                    <div class="modal-header border-0 pb-0">
+                        <h5 class="fw-bold">Share Your Experience</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-4">
+                        <form id="siteReviewForm">
+                            {% csrf_token %}
+
+                            <!-- Star Rating -->
+                            <div class="text-center mb-4">
+                                <div class="site-star-rating d-flex justify-content-center flex-row-reverse gap-2 fs-2">
+                                    <input type="radio" id="site-star5" name="rating" value="5" /><label
+                                        for="site-star5" title="5 stars"><i class="fas fa-star"></i></label>
+                                    <input type="radio" id="site-star4" name="rating" value="4" /><label
+                                        for="site-star4" title="4 stars"><i class="fas fa-star"></i></label>
+                                    <input type="radio" id="site-star3" name="rating" value="3" /><label
+                                        for="site-star3" title="3 stars"><i class="fas fa-star"></i></label>
+                                    <input type="radio" id="site-star2" name="rating" value="2" /><label
+                                        for="site-star2" title="2 stars"><i class="fas fa-star"></i></label>
+                                    <input type="radio" id="site-star1" name="rating" value="1" /><label
+                                        for="site-star1" title="1 star"><i class="fas fa-star"></i></label>
+                                </div>
+                                <div id="siteRatingError" class="text-danger small mt-1 d-none">Please select a rating
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-uppercase text-muted">Full Name</label>
+                                <input type="text" name="client_name" class="form-control border-0 bg-light p-3"
+                                    value="{% if user.is_authenticated %}{{ user.get_full_name|default:user.username }}{% endif %}"
+                                    placeholder="Name" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-uppercase text-muted">Role
+                                    (Optional)</label>
+                                <input type="text" name="client_role" class="form-control border-0 bg-light p-3"
+                                    placeholder="Role">
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label small fw-bold text-uppercase text-muted">Your
+                                    Testimonial</label>
+                                <textarea name="quote" class="form-control border-0 bg-light p-3" rows="4"
+                                    placeholder="Testimonial In Detail" required></textarea>
+                            </div>
+
+                            <button type="submit" id="submitSiteReviewBtn"
+                                class="btn btn-ocean w-100 py-3 rounded-pill fw-bold">
+                                Submit Testimonial
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Section -->
+<section id="contact" class="py-5 bg-ice-blue">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center" data-aos="fade-up">
+                <h2 class="mb-4 display-5 fw-bold text-navy">Ready to Create Magic?</h2>
+                <p class="lead text-muted mb-5">Let's discuss your next event throughout a free consultation.</p>
+                <form class="row g-3">
+                    <div class="col-md-6">
+                        <input type="text" name="name" class="form-control form-control-lg border-0 shadow-sm"
+                            placeholder="Name" required>
+                    </div>
+                    <div class="col-md-6">
+                        <input type="email" name="email" class="form-control form-control-lg border-0 shadow-sm"
+                            placeholder="Email" required>
+                    </div>
+                    <div class="col-12">
+                        <textarea name="message" class="form-control form-control-lg border-0 shadow-sm" rows="4"
+                            placeholder="Event Details" required></textarea>
+                    </div>
+                    <div class="col-12 mt-4">
+                        <button type="submit" class="btn btn-ocean btn-lg px-5 rounded-pill shadow-lg">Send
+                            Inquiry</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>

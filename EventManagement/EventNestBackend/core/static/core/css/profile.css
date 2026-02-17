@@ -1,0 +1,227 @@
+/* Profile Page - Modern App UI Style */
+
+/* Header Section */
+.profile-header-bg {
+    background: linear-gradient(135deg, #FF9966 0%, #FF5E62 100%);
+    /* Orange gradient */
+    height: 280px;
+    position: relative;
+    border-bottom-left-radius: 30px;
+    border-bottom-right-radius: 30px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.back-btn {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    z-index: 10;
+    text-decoration: none;
+}
+
+.header-illustration {
+    opacity: 0.9;
+    max-width: 80%;
+    max-height: 80%;
+}
+
+/* Floating Profile Card */
+.profile-card-floating {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    text-align: center;
+    margin-top: -100px;
+    /* Overlap effect */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    position: relative;
+    z-index: 5;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.profile-avatar-large {
+    width: 80px;
+    height: 80px;
+    background-color: #FF6700;
+    color: white;
+    font-size: 2rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 20px;
+    /* Squircle */
+    margin: 0 auto 15px;
+    box-shadow: 0 5px 15px rgba(255, 103, 0, 0.3);
+}
+
+.profile-name {
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.profile-role {
+    color: #888;
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+}
+
+.stats-row {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    border-top: 1px solid #f0f0f0;
+    padding-top: 15px;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-val {
+    font-weight: bold;
+    color: #333;
+    font-size: 1.1rem;
+    display: block;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: #999;
+}
+
+/* Main Content Area */
+.profile-content-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding-bottom: 40px;
+}
+
+.section-label {
+    font-weight: 700;
+    color: #333;
+    font-size: 1.25rem;
+    margin-top: 30px;
+    margin-bottom: 20px;
+    padding-left: 10px;
+}
+
+/* Data List Items */
+.data-item {
+    background: white;
+    border-radius: 15px;
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: default;
+    border: 1px solid #eee;
+}
+
+.data-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.item-icon {
+    width: 45px;
+    height: 45px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    margin-right: 20px;
+}
+
+/* Icon Colors */
+.bg-light-orange {
+    background-color: #FFF3E0;
+    color: #FF9800;
+}
+
+.bg-light-blue {
+    background-color: #E3F2FD;
+    color: #2196F3;
+}
+
+.bg-light-green {
+    background-color: #E8F5E9;
+    color: #4CAF50;
+}
+
+.bg-light-purple {
+    background-color: #F3E5F5;
+    color: #9C27B0;
+}
+
+.bg-light-red {
+    background-color: #FFEBEE;
+    color: #F44336;
+}
+
+.item-content {
+    flex-grow: 1;
+}
+
+.item-title {
+    font-weight: 600;
+    color: #333;
+    font-size: 0.95rem;
+    margin-bottom: 2px;
+}
+
+.item-value {
+    color: #777;
+    font-size: 0.85rem;
+    margin: 0;
+    word-break: break-all;
+}
+
+.action-arrow {
+    color: #ccc;
+}
+
+/* Action Buttons (Logout/Edit) */
+.action-btn-row {
+    margin-top: 30px;
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+/* Extra styles for inputs in the modern card */
+.profile-input {
+    border: none;
+    border-bottom: 2px solid #eee;
+    border-radius: 0;
+    padding: 5px 0;
+    font-weight: 500;
+    color: #333;
+    background: transparent;
+    width: 100%;
+    transition: border-color 0.3s;
+}
+
+.profile-input:focus {
+    outline: none;
+    border-bottom-color: #FF6700;
+    box-shadow: none;
+}
+
+.profile-input:read-only {
+    background-color: transparent;
+    color: #777;
+    border-bottom: 1px dashed #ddd;
+}

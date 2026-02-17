@@ -1,0 +1,268 @@
+{% load static %}
+<!-- Light Navbar with Red Accents -->
+<nav class="navbar navbar-expand-lg navbar-light fixed-top py-3 bg-white shadow-sm"
+    style="background-color: #ffffff !important;">
+    <div class="container-fluid px-4 position-relative">
+        <!-- Logo & Brand -->
+        <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'index' %}">
+            <img src="{% static 'core/images/branding/logo.png' %}" alt="EventNest" class="navbar-logo">
+            <div>
+                <h4 class="mb-0 text-navy fw-bold nav-brand-text">
+                    EventNest</h4>
+            </div>
+        </a>
+
+        <!-- Mobile Toggle -->
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Navigation Links & Buttons -->
+        <!-- Links are set relative to Root (F:/Project/EventManagement/EventManagement/) -->
+        <!-- main.js will automatically adjust them if loaded in a subfolder (html/) -->
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <!-- Center: Nav Links -->
+            <div class="navbar-nav navbar-nav-centered align-items-center">
+                <a class="nav-link nav-link-custom px-2 fw-bold" href="{% url 'index' %}">Home</a>
+                <a class="nav-link nav-link-custom px-2 fw-bold" href="{% url 'events' %}">Events</a>
+                <a class="nav-link nav-link-custom px-2 fw-bold" href="{% url 'student_events' %}">Student Zone</a>
+                <a class="nav-link nav-link-custom px-2 fw-bold" href="{% url 'index' %}#services">Services</a>
+                <a class="nav-link nav-link-custom px-2 fw-bold" href="{% url 'gallery' %}">Gallery</a>
+                <a class="nav-link nav-link-custom px-2 fw-bold" href="{% url 'index' %}#contact">Contact Us</a>
+            </div>
+
+            <!-- Right: Action Buttons -->
+            <div class="d-flex align-items-center gap-3 mt-3 mt-lg-0 ms-lg-auto">
+
+
+                <a href="{% url 'custom_event' %}" class="btn btn-outline-ocean text-nowrap">Plan Event</a>
+                {% if user.is_authenticated %}
+                <div class="dropdown">
+                    <button class="btn btn-ocean dropdown-toggle text-nowrap" type="button" data-bs-toggle="dropdown">
+                        Hi, {{ user.first_name|default:user.username }}
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end bg-white border-light shadow-sm">
+                        <li><a class="dropdown-item text-navy" href="{% url 'dashboard' %}">Dashboard</a></li>
+                        <li><a class="dropdown-item text-navy" href="{% url 'profile' %}">My Profile</a></li>
+                        <li><a class="dropdown-item text-navy" href="{% url 'liked_events' %}">Liked Events</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item text-danger" href="{% url 'logout' %}">Logout</a></li>
+                    </ul>
+                </div>
+                {% else %}
+                <a href="{% url 'login' %}" class="btn btn-ocean text-nowrap">Sign In</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</nav>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+    });
+</script>
+
+</style>
+
+<style>
+    /* Forceful Button Overrides for Consistency */
+    .btn-outline-ocean {
+        border: 2px solid #E11D48 !important;
+        color: #E11D48 !important;
+        background: transparent !important;
+        text-transform: uppercase !important;
+        font-family: 'Outfit', sans-serif !important;
+        font-size: 0.9rem !important;
+        letter-spacing: 1px !important;
+        font-weight: 600 !important;
+        padding: 10px 24px !important;
+        border-radius: 50px !important;
+        transition: all 0.3s ease !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    .btn-outline-ocean:hover {
+        background-color: #E11D48 !important;
+        color: #ffffff !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 4px 12px rgba(225, 29, 72, 0.3) !important;
+    }
+
+    .btn-ocean {
+        background: linear-gradient(135deg, #E11D48, #BE123C) !important;
+        color: #ffffff !important;
+        border: none !important;
+        text-transform: uppercase !important;
+        font-family: 'Outfit', sans-serif !important;
+        font-size: 0.9rem !important;
+        letter-spacing: 1px !important;
+        font-weight: 600 !important;
+        padding: 10px 24px !important;
+        border-radius: 50px !important;
+        transition: all 0.3s ease !important;
+    }
+
+    .btn-ocean:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 4px 12px rgba(225, 29, 72, 0.4) !important;
+        color: #ffffff !important;
+    }
+
+    /* Custom Navigation Links */
+    .nav-link-custom {
+        color: #0A1628 !important;
+        position: relative;
+        transition: color 0.3s ease;
+        font-size: 0.95rem;
+        letter-spacing: 0.3px;
+    }
+
+
+    .nav-link-custom:hover {
+        color: #E11D48 !important;
+    }
+
+    .nav-link-custom::after {
+        content: '';
+        position: absolute;
+        width: 0;
+        height: 3px;
+        bottom: -5px;
+        left: 15%;
+        background-color: #E11D48;
+        transition: width 0.3s ease;
+        border-radius: 2px;
+    }
+
+    .nav-link-custom:hover::after,
+    .nav-link-custom.active::after {
+        width: 70%;
+    }
+
+    .nav-link-custom.active {
+        color: #E11D48 !important;
+    }
+
+    /* Absolute Centering for Desktop (Compact) */
+    @media (min-width: 992px) {
+        .navbar-nav-centered {
+            position: absolute;
+            left: 42%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: row;
+            margin: 0 !important;
+            padding: 0 !important;
+            width: auto;
+            z-index: 1000;
+        }
+    }
+
+    .navbar-logo {
+        height: 55px;
+        width: 55px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #E11D48;
+    }
+
+    .nav-brand-text {
+        letter-spacing: 0.5px;
+        font-size: 22px;
+        color: #0A1628;
+    }
+
+    @media (max-width: 991.98px) {
+        .navbar-logo {
+            height: 45px;
+            width: 45px;
+        }
+
+        .nav-brand-text {
+            font-size: 18px;
+        }
+
+        .navbar-nav-centered {
+            margin: 20px 0 !important;
+        }
+
+        .navbar-collapse .d-flex {
+            flex-direction: column;
+            width: 100%;
+            gap: 10px !important;
+        }
+
+        .navbar-collapse .btn {
+            width: 100%;
+        }
+
+        .city-selector-en {
+            justify-content: center;
+            width: 100%;
+            background: #f8f9fa;
+        }
+    }
+</style>
+
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Function to set active link based on hash or current path
+        function setActiveLink() {
+            const currentHash = window.location.hash;
+            const currentPath = window.location.pathname;
+            const navLinks = document.querySelectorAll('.nav-link-custom');
+
+            // First, remove active class from all
+            navLinks.forEach(link => link.classList.remove('active'));
+
+            let matched = false;
+
+            // Check for hash matches first (Services, Contact)
+            if (currentHash) {
+                navLinks.forEach(link => {
+                    if (link.getAttribute('href').includes(currentHash)) {
+                        link.classList.add('active');
+                        matched = true;
+                    }
+                });
+            }
+
+            // If no hash match, fallback to path match (Django active logic helps, but this enforces JS side)
+            if (!matched) {
+                navLinks.forEach(link => {
+                    const href = link.getAttribute('href');
+                    // simple check: if href matches path and isn't a hash link
+                    if (href === currentPath || (href === '/' && currentPath === '/')) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+        }
+
+        // Run on load
+        setActiveLink();
+
+        // Run on hash change
+        window.addEventListener('hashchange', setActiveLink);
+
+        // Add click listeners to upadte immediately without waiting for hashchange (smoother)
+        const navLinks = document.querySelectorAll('.nav-link-custom');
+        navLinks.forEach(link => {
+            link.addEventListener('click', function () {
+                // If it's a hash link, manually set active
+                if (this.getAttribute('href').includes('#')) {
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
+                }
+            });
+        });
+    });
+</script>

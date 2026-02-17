@@ -1,0 +1,158 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container" style="margin-top: 100px;">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card shadow hover-lift">
+                <div class="card-body p-4">
+                    <h3 class="card-title text-center text-primary mb-4">Verify Your Email</h3>
+
+                    <div id="alert-box"></div>
+
+                    <p class="text-center text-muted">
+                        Enter the 6-digit code sent to <br><strong>{{ email }}</strong>
+                    </p>
+
+                    <form id="otp-form">
+                        {% csrf_token %}
+                        <div class="mb-4">
+                            <input type="text" class="form-control text-center fs-3" id="code" name="code"
+                                placeholder="Enter Verification Code" maxlength="6" required
+                                style="letter-spacing: 0.5em; font-weight: bold;">
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary" id="verify-btn">Verify & Proceed</button>
+                        </div>
+                    </form>
+
+                    <div class="text-center mt-4">
+                        <span id="timer-box" class="text-muted small">
+                            Resend in <span id="timer" class="fw-bold text-dark">02:00</span>
+                        </span>
+                        <button id="resend-btn" class="btn btn-link btn-sm mt-2 p-0" style="display: none;">Resend
+                            OTP</button>
+                    </div>
+
+                    <div class="text-center mt-3">
+                        <a href="{% url 'register' %}" class="small text-decoration-none text-muted">Change
+                            Email</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const otpForm = document.getElementById('otp-form');
+        const verifyBtn = document.getElementById('verify-btn');
+        const resendBtn = document.getElementById('resend-btn');
+        const timerSpan = document.getElementById('timer');
+        const timerBox = document.getElementById('timer-box');
+        const alertBox = document.getElementById('alert-box');
+
+        // Timer Logic
+        let timeLeft = 120; // 2 minutes
+        let timerId;
+
+        function startTimer() {
+            resendBtn.style.display = 'none';
+            timerBox.style.display = 'inline';
+            timeLeft = 120;
+
+            clearInterval(timerId);
+            timerId = setInterval(() => {
+                if (timeLeft <= 0) {
+                    clearInterval(timerId);
+                    timerBox.style.display = 'none';
+                    resendBtn.style.display = 'inline-block';
+                } else {
+                    timeLeft--;
+                    const minutes = Math.floor(timeLeft / 60);
+                    const seconds = timeLeft % 60;
+                    timerSpan.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                }
+            }, 1000);
+        }
+
+        startTimer();
+
+        function showAlert(message, type) {
+            alertBox.innerHTML = `
+                <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            `;
+        }
+
+        otpForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const code = document.getElementById('code').value;
+
+            verifyBtn.disabled = true;
+            verifyBtn.textContent = 'Verifying...';
+
+            fetch("{% url 'verify_otp_api' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({ code: code })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        showAlert(data.message, 'success');
+                        setTimeout(() => {
+                            window.location.href = data.redirect_url;
+                        }, 500);
+                    } else {
+                        showAlert(data.message, 'danger');
+                        verifyBtn.disabled = false;
+                        verifyBtn.textContent = 'Verify & Proceed';
+                    }
+                })
+                .catch(error => {
+                    showAlert('An error occurred.', 'danger');
+                    verifyBtn.disabled = false;
+                    verifyBtn.textContent = 'Verify & Proceed';
+                });
+        });
+
+        resendBtn.addEventListener('click', function () {
+            resendBtn.disabled = true;
+            resendBtn.textContent = 'Sending...';
+
+            fetch("{% url 'resend_otp_api' %}", {
+                method: 'POST',
+                headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    resendBtn.disabled = false;
+                    resendBtn.textContent = 'Resend OTP';
+                    if (data.status === 'success') {
+                        showAlert(data.message, 'success');
+                        startTimer();
+                    } else {
+                        showAlert(data.message, 'danger');
+                    }
+                })
+                .catch(error => {
+                    resendBtn.disabled = false;
+                    resendBtn.textContent = 'Resend OTP';
+                    showAlert('An error occurred. Please try again.', 'danger');
+                });
+        });
+
+        // Auto-focus input
+        const codeInput = document.getElementById('code');
+        if (codeInput) codeInput.focus();
+    });
+</script>
+{% endblock %}

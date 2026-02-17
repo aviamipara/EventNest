@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Your Email</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #E11D48, #BE123C);
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #ffffff;
+            margin: 0;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .content {
+            padding: 40px 30px;
+            color: #333333;
+        }
+
+        .greeting {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #111827;
+        }
+
+        .message {
+            margin-bottom: 30px;
+            color: #4b5563;
+        }
+
+        .otp-box {
+            background-color: #FFF1F2;
+            border: 2px dashed #E11D48;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .otp-code {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 36px;
+            font-weight: 800;
+            color: #E11D48;
+            letter-spacing: 5px;
+            margin: 0;
+        }
+
+        .footer {
+            background-color: #f9fafb;
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #6b7280;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .footer a {
+            color: #E11D48;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div style="padding: 20px 0;">
+        <div class="container">
+            <div class="header">
+                <h1>EventNest</h1>
+            </div>
+            <div class="content">
+                <p class="greeting">Hi {{ user.first_name|default:'User' }},</p>
+                <p class="message">
+                    Thank you for choosing EventNest! Please use the verification code below to complete your
+                    registration process.
+                </p>
+
+                <div class="otp-box">
+                    <p style="margin: 0 0 10px 0; font-size: 14px; color: #E11D48; font-weight: 600;">YOUR VERIFICATION
+                        CODE</p>
+                    <h2 class="otp-code">{{ verification_code }}</h2>
+                </div>
+
+                <p class="message" style="font-size: 14px; color: #6b7280;">
+                    This code will expire in 10 minutes. If you didn't request this code, please ignore this email.
+                </p>
+
+                <p style="margin-top: 30px;">
+                    Best regards,<br>
+                    <strong>The EventNest Team</strong>
+                </p>
+            </div>
+            <div class="footer">
+                <p>&copy; 2026 EventNest. All rights reserved.</p>
+                <p>
+                    <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

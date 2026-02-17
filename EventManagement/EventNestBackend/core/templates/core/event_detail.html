@@ -1,0 +1,434 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}{{ event.title }} - EventNest{% endblock %}
+
+{% block main_class %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Event Detail Specific Styles */
+    body {
+        background-color: #F8FAFC;
+    }
+
+    .event-hero {
+        height: 500px;
+        background-color: #0F172A;
+        background-image: linear-gradient(to bottom, rgba(10, 22, 40, 0.3), rgba(10, 22, 40, 0.9)),
+        url('{% if event.get_image_url %}{{ event.get_image_url }}{% if "?" in event.get_image_url %}&{% else %}?{% endif %}v={{ event.id }}{% else %}https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?auto=format&fit=crop&w=1920&q=80{% endif %}');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        position: relative;
+        display: flex;
+        align-items: flex-end;
+        padding-bottom: 60px;
+    }
+
+    .hero-title-wrapper {
+        position: relative;
+        z-index: 2;
+    }
+
+    .hero-badge {
+        background: #E11D48 !important;
+        /* Red Theme */
+        color: #ffffff !important;
+        padding: 6px 16px;
+        border-radius: 30px;
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        display: inline-block;
+        margin-bottom: 15px;
+    }
+
+    .review-date {
+        font-size: 0.85rem;
+    }
+
+    /* Star Rating Styles */
+    .star-rating {
+        font-size: 2.5rem;
+        color: #ddd;
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .star-rating input {
+        display: none;
+    }
+
+    .star-rating label {
+        cursor: pointer;
+        transition: color 0.2s ease-in-out;
+        color: #ddd;
+    }
+
+    .star-rating label:hover,
+    .star-rating label:hover~label,
+    .star-rating input:checked~label {
+        color: #ffc107;
+    }
+
+    .star-rating label:hover i,
+    .star-rating label:hover~label i,
+    .star-rating input:checked~label i {
+        font-weight: 900;
+    }
+
+    .info-icon {
+        width: 40px;
+        height: 40px;
+        background: rgba(225, 29, 72, 0.1) !important;
+        color: #E11D48 !important;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        flex-shrink: 0;
+    }
+
+    .btn-book-lg {
+        background: #E11D48 !important;
+        color: #ffffff !important;
+        width: 100%;
+        padding: 16px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        border: none;
+        transition: 0.3s;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .btn-book-lg:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(225, 29, 72, 0.3) !important;
+        background: #be123c !important;
+        color: #ffffff !important;
+    }
+
+    .nav-pills .nav-link.active {
+        background-color: #E11D48 !important;
+        color: #ffffff !important;
+    }
+
+    .content-section {
+        background: white;
+        padding: 40px;
+        border-radius: 20px;
+        margin-bottom: 30px;
+        border: 1px solid #E2E8F0;
+    }
+
+    .artist-card {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .artist-img {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-bottom: 15px;
+        border: 3px solid var(--accent-cyan);
+        padding: 3px;
+    }
+
+    .booking-sidebar {
+        position: -webkit-sticky;
+        position: sticky;
+        top: 120px;
+        /* Adjust based on navbar height */
+        background: #ffffff;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(0, 0, 0, 0.04);
+        padding: 30px !important;
+        margin-bottom: 30px;
+        transition: all 0.3s ease;
+        z-index: 100;
+        width: 100%;
+        /* Force full width */
+        display: block;
+        /* Ensure block display */
+        box-sizing: border-box;
+        /* Handle strict padding */
+    }
+
+    .booking-sidebar:hover {
+        box-shadow: 0 15px 50px rgba(225, 29, 72, 0.1);
+        transform: translateY(-5px);
+    }
+
+    /* Hide sticky footer on desktop */
+    @media (min-width: 992px) {
+        .sticky-booking-footer {
+            display: none !important;
+        }
+    }
+
+    /* Mobile Adjustments */
+    @media (max-width: 991px) {
+        .event-hero {
+            height: 400px;
+        }
+
+        .event-title-large {
+            font-size: 2.5rem;
+        }
+
+        .booking-sidebar {
+            position: static;
+            margin-top: 30px;
+            margin-bottom: 100px;
+            box-shadow: none;
+            border: none;
+            background: transparent;
+            padding: 0 !important;
+        }
+
+        .sticky-booking-footer {
+            display: flex !important;
+        }
+    }
+
+    /* Sticky Footer */
+    .sticky-booking-footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background: white;
+        padding: 15px 20px;
+        box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+        display: none;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .showtime-pill {
+        border: 1px solid #E2E8F0;
+        border-radius: 6px;
+        padding: 8px 12px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: #10B981;
+        /* Green for available */
+        cursor: pointer;
+        transition: all 0.2s;
+        text-align: center;
+        min-width: 90px;
+    }
+
+    .showtime-pill:hover {
+        border-color: #E11D48;
+        color: #E11D48;
+        background: #FFF1F2;
+    }
+
+    .showtime-pill.sold-out {
+        color: #94A3B8;
+        pointer-events: none;
+        background: #F1F5F9;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="event-hero">
+    <div class="container">
+        <div class="hero-title-wrapper">
+            <span class="hero-badge">{{ event.category }}</span>
+            <h1 class="event-title-large text-white">{{ event.title }}</h1>
+            <p class="text-white opacity-75 fs-5"><i class="fas fa-map-marker-alt me-2" style="color: #E11D48;"></i>
+                {{event.location}}</p>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content Grid -->
+<div class="container my-5">
+    <div class="row">
+        <!-- Left Content: Tabs & Info -->
+        <div class="col-lg-8">
+
+            <!-- Nav Tabs -->
+            <ul class="nav nav-pills mb-4" id="pills-tab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="pills-about-tab" data-bs-toggle="pill"
+                        data-bs-target="#pills-about" type="button" role="tab">About</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="pills-lineup-tab" data-bs-toggle="pill" data-bs-target="#pills-lineup"
+                        type="button" role="tab">Artist Lineup</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="pills-venue-tab" data-bs-toggle="pill" data-bs-target="#pills-venue"
+                        type="button" role="tab">Venue Info</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="pills-reviews-tab" data-bs-toggle="pill"
+                        data-bs-target="#pills-reviews" type="button" role="tab">What Clients Say</button>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="pills-tabContent">
+                <!-- About Tab -->
+                <div class="tab-pane fade show active" id="pills-about" role="tabpanel">
+                    <div class="content-section">
+                        <h3 class="fw-bold mb-3">Experience the Magic</h3>
+                        <p class="text-secondary lh-lg mb-4">
+                            {{ event.description|linebreaks }}
+                        </p>
+
+                        <hr class="my-4">
+
+                        <h5 class="fw-bold mb-3">Highlights</h5>
+                        <!-- Static highlights for now as model doesn't have them -->
+                        <ul class="list-unstyled text-secondary">
+                            <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Premium Experience
+                            </li>
+                            <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Top Tier Amenities
+                            </li>
+                            <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Exclusive Access</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Lineup Tab (Static Placeholder for now) -->
+                <div class="tab-pane fade" id="pills-lineup" role="tabpanel">
+                    <div class="content-section">
+                        <h3 class="fw-bold mb-4">Featured Artists</h3>
+                        <div class="row">
+                            <p class="text-muted">Artist lineup to be announced soon.</p>
+                            <!-- Retaining visual structure if needed later -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Venue Tab -->
+                <div class="tab-pane fade" id="pills-venue" role="tabpanel">
+                    <div class="content-section">
+                        <h3 class="fw-bold mb-3">{{ event.location }}</h3>
+                        <p class="text-muted">Detailed venue information will be shared upon booking.</p>
+                    </div>
+                </div>
+
+                <!-- Reviews Tab (Now Website Testimonials) -->
+                <div class="tab-pane fade" id="pills-reviews" role="tabpanel">
+                    <div class="content-section">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h3 class="fw-bold mb-0">What Our Clients Say</h3>
+                        </div>
+
+                        <div class="testimonials-list">
+                            {% for review in reviews %}
+                            <div class="mb-4 border-bottom pb-4 last-no-border">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar me-3 bg-ocean text-white rounded-circle d-flex align-items-center justify-content-center"
+                                            style="width: 40px; height: 40px; font-weight: bold;">
+                                            {{ review.client_name|make_list|first|upper }}
+                                        </div>
+                                        <div>
+                                            <h6 class="fw-bold mb-0">{{ review.client_name }}</h6>
+                                            <small class="text-muted">{{ review.client_role|default:"Happy Client"
+                                                }}</small>
+                                        </div>
+                                    </div>
+                                    <div class="text-warning">
+                                        {% for i in "12345"|make_list %}
+                                        {% if forloop.counter <= review.rating %} <i class="fas fa-star"></i>
+                                            {% else %}
+                                            <i class="far fa-star"></i>
+                                            {% endif %}
+                                            {% endfor %}
+                                    </div>
+                                </div>
+                                <p class="text-secondary mb-0 ps-5">"{{ review.quote }}"</p>
+                            </div>
+                            {% empty %}
+                            <div class="text-center py-5 opacity-50">
+                                <i class="far fa-comment-dots fs-1 mb-3"></i>
+                                <p>No testimonials to show yet. Be the first to share your experience on the <a
+                                        href="{% url 'index' %}">homepage</a>!</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Sidebar: Booking -->
+        <div class="col-lg-4">
+            <div class="booking-sidebar text-center p-4" style="width: 100%; display: block; box-sizing: border-box;">
+                <div class="mb-4">
+                    <span class="text-muted small text-uppercase fw-bold d-block mb-2">Starting from</span>
+                    <div class="price-tag fs-1 fw-bold text-navy mb-3" style="color: #0F172A;">{{ event.price }}</div>
+                    <div class="badge bg-danger bg-opacity-10 text-danger px-3 py-2 rounded-pill shadow-sm">
+                        <i class="fas fa-fire me-1"></i> Selling Fast
+                    </div>
+                </div>
+
+                <hr class="my-4" style="opacity: 0.1;">
+
+                <!-- Booking Action -->
+                <div class="mb-4 d-flex justify-content-center">
+                    <div class="d-flex flex-column align-items-start">
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="fas fa-check-circle text-success me-2" style="width: 20px;"></i>
+                            <span class="text-muted small">Instant Confirmation</span>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-shield-alt text-success me-2" style="width: 20px;"></i>
+                            <span class="text-muted small">100% Secure Booking</span>
+                        </div>
+                    </div>
+                </div>
+
+                <a href="{% url 'booking' %}?event={{ event.title }}"
+                    class="btn btn-book-lg shadow w-100 d-flex align-items-center justify-content-center py-3">
+                    Book Ticket Now <i class="fas fa-arrow-right ms-2"></i>
+                </a>
+
+                <div class="text-center mt-3">
+                    <small class="text-muted">Limited slots available!</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Mobile Sticky Footer -->
+<div class="sticky-booking-footer">
+    <div class="d-flex flex-column">
+        <span class="small text-muted">Price starting from</span>
+        <span class="fw-bold fs-5 text-navy">{{ event.price }}</span>
+    </div>
+    <a href="{% url 'booking' %}?event={{ event.title }}" class="btn btn-danger px-4 py-2 rounded-3 fw-bold">
+        Book Now
+    </a>
+</div>
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %}

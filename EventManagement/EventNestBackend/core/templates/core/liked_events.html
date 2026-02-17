@@ -1,0 +1,137 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}My Liked Events - EventNest{% endblock %}
+
+{% block main_class %}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'core/css/events.css' %}">
+<style>
+    .liked-hero {
+        background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+        padding: 60px 0;
+        color: white;
+        margin-bottom: 30px;
+    }
+
+    .like-btn {
+        color: white;
+        transition: color 0.3s ease;
+    }
+
+    .like-btn.liked {
+        color: #ff3b30;
+    }
+
+    .like-btn.liked i {
+        filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.5));
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="liked-hero">
+    <div class="container text-center">
+        <h1 class="fw-bold"><i class="fas fa-heart me-3"></i>My Favorite Events</h1>
+        <p class="lead mb-0">Events you've saved for later</p>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="container mb-5">
+    <div class="events-grid">
+        {% for event in events %}
+        <div class="event-card" id="event-card-{{ event.id }}">
+            <div class="card-image-container" style="position: relative;">
+                {% if event.image_url %}
+                {% if 'http' in event.image_url %}
+                <img src="{{ event.image_url }}" alt="{{ event.title }}" class="card-img-top">
+                {% else %}
+                <img src="{% get_static_prefix %}{{ event.image_url }}" alt="{{ event.title }}" class="card-img-top">
+                {% endif %}
+                {% else %}
+                <img src="https://images.unsplash.com/photo-1514525253440-b393452de23e?auto=format&fit=crop&w=800&q=80"
+                    alt="{{ event.title }}" class="card-img-top">
+                {% endif %}
+
+                <!-- Like Button (Already Liked) -->
+                <button class="btn btn-link position-absolute top-0 end-0 p-3 like-btn liked"
+                    data-event-id="{{ event.id }}" onclick="toggleLike(this, '{{ event.id }}')" style="z-index: 10;">
+                    <i class="fas fa-heart fa-lg"></i>
+                </button>
+            </div>
+            <div class="card-content">
+                <div>
+                    <h3 class="event-name">{{ event.title }}</h3>
+                    <p class="event-genre">{{ event.category|title }}</p>
+                    <p class="event-date text-muted"><i class="far fa-calendar me-2"></i>{{ event.date|date:"M d, Y" }}
+                    </p>
+                </div>
+                <div class="card-actions">
+                    <a href="{% url 'event_detail' event.id %}" class="view-btn">View</a>
+                    <a href="{% url 'booking' %}?event={{ event.title }}" class="book-btn">Book</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-5">
+            <div class="mb-4">
+                <i class="far fa-heart fa-4x text-muted"></i>
+            </div>
+            <h3 class="text-secondary">No liked events yet.</h3>
+            <p class="text-muted">Start exploring and save events you love!</p>
+            <a href="{% url 'events' %}" class="btn btn-primary rounded-pill mt-3 px-4">Browse Events</a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function toggleLike(btn, eventId) {
+        // For Liked Events page, we might want to remove the card if unliked
+        // But for consistency with other pages, let's just toggle icon first, 
+        // or removing it might be jarring.
+        // Let's toggle icon. If user refreshes, it will be gone.
+
+        const icon = btn.querySelector('i');
+        const isLiked = icon.classList.contains('fas');
+
+        if (isLiked) {
+            icon.classList.remove('fas');
+            icon.classList.add('far');
+            btn.style.color = 'white';
+        } else {
+            icon.classList.remove('far');
+            icon.classList.add('fas');
+            btn.style.color = '#ff3b30';
+        }
+
+
+        const url = "{% url 'toggle_like' 0 %}".replace('0', eventId);
+        fetch(url)
+            .then(response => {
+                if (response.status === 401) {
+                    window.location.href = "{% url 'login' %}";
+                    return null;
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (!data) return;
+
+                if (data.status === 'success') {
+                    if (!data.is_liked) {
+                        // Optional: Fade out card
+                        // const card = document.getElementById(`event-card-${eventId}`);
+                        // card.style.opacity = '0.5';
+                    }
+                }
+            })
+            .catch(err => console.error(err));
+    }
+</script>
+{% endblock %}

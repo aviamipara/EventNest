@@ -1,0 +1,180 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Gallery - EventNest{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'core/css/gallery.css' %}?v=10">
+<style>
+    /* Fix for text clipping - spacing for fixed navbar */
+    /* Pagination Styles (Matching Events Page) */
+    .pagination-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        margin-top: 2rem;
+    }
+
+    .page-btn {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: #fff;
+        border: 1px solid #e1e4e8;
+        color: #0A1628;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        font-weight: 600;
+    }
+
+    .page-btn:hover:not(.disabled) {
+        background: #00d2ff;
+        border-color: #00d2ff;
+        color: #000;
+        transform: translateY(-2px);
+    }
+
+    .page-btn.active {
+        background: #0A1628;
+        border-color: #0A1628;
+        color: #fff;
+    }
+
+    .page-btn.disabled {
+        background: #f8f9fa;
+        color: #adb5bd;
+        cursor: not-allowed;
+    }
+
+    .page-ellipsis {
+        color: #6c757d;
+        font-weight: bold;
+    }
+
+    /* Active Filter Styles */
+    .filter-btn {
+        text-decoration: none;
+    }
+
+    .filter-btn.active {
+        background-color: #0A1628;
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Hero Section -->
+<div class="hero-section">
+    <div class="hero-content">
+        <h1>Our Gallery</h1>
+        <p>A glimpse into the magical moments we've created.</p>
+
+    </div>
+</div>
+
+<!-- Gallery Section -->
+<section class="py-5 bg-white">
+    <div class="container py-3">
+
+        <!-- Gallery Filters -->
+        <div class="row mb-5">
+            <div class="col-12 d-flex justify-content-center gap-2 flex-wrap" id="gallery-filters">
+                <a href="?category=all{% if search_query %}&q={{ search_query }}{% endif %}"
+                    class="btn filter-btn {% if current_category == 'all' %}active{% endif %}">All</a>
+                <a href="?category=wedding{% if search_query %}&q={{ search_query }}{% endif %}"
+                    class="btn filter-btn {% if current_category == 'wedding' %}active{% endif %}">Weddings</a>
+                <a href="?category=corporate{% if search_query %}&q={{ search_query }}{% endif %}"
+                    class="btn filter-btn {% if current_category == 'corporate' %}active{% endif %}">Corporate</a>
+                <a href="?category=concert{% if search_query %}&q={{ search_query }}{% endif %}"
+                    class="btn filter-btn {% if current_category == 'concert' %}active{% endif %}">Concerts</a>
+                <a href="?category=parties{% if search_query %}&q={{ search_query }}{% endif %}"
+                    class="btn filter-btn {% if current_category == 'parties' %}active{% endif %}">Parties</a>
+            </div>
+        </div>
+
+        <!-- Gallery Grid -->
+        <div class="row g-3" id="gallery-grid">
+            {% for item in gallery_items %}
+            <div class="col-lg-4 col-md-6 mb-4 gallery-item-wrapper">
+                <div class="gallery-item-card">
+                    {% if item.image %}
+                    <img src="{{ item.get_image_url }}" alt="{{ item.title }}" loading="lazy" class="gallery-img"
+                        data-fallback="{% static 'core/images/categories/cat_social.png' %}">
+                    {% else %}
+                    <img src="{% static 'core/images/categories/cat_social.png' %}" alt="Placeholder"
+                        class="gallery-img">
+                    {% endif %}
+                    <div class="gallery-info mt-3">
+                        <h5 class="mb-1 fw-bold">{{ item.title }}</h5>
+                        <p class="text-muted small mb-0">{{ item.get_category_display }}</p>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center py-5">
+                <h3 class="text-secondary">No images found.</h3>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if page_obj.paginator.num_pages > 1 %}
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="pagination-container">
+                    <!-- Previous Page -->
+                    {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}{% if current_category != 'all' %}&category={{ current_category }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}"
+                        class="page-btn"><i class="fas fa-chevron-left"></i></a>
+                    {% else %}
+                    <span class="page-btn disabled"><i class="fas fa-chevron-left"></i></span>
+                    {% endif %}
+
+                    <!-- Page Numbers -->
+                    <!-- Page Numbers -->
+                    {% for num in custom_page_range %}
+                    {% if num == page_obj.paginator.ELLIPSIS %}
+                    <span class="page-ellipsis">...</span>
+                    {% elif page_obj.number == num %}
+                    <span class="page-btn active">{{ num }}</span>
+                    {% else %}
+                    <a href="?page={{ num }}{% if current_category != 'all' %}&category={{ current_category }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}"
+                        class="page-btn">{{ num }}</a>
+                    {% endif %}
+                    {% endfor %}
+
+                    <!-- Next Page -->
+                    {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}{% if current_category != 'all' %}&category={{ current_category }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}"
+                        class="page-btn"><i class="fas fa-chevron-right"></i></a>
+                    {% else %}
+                    <span class="page-btn disabled"><i class="fas fa-chevron-right"></i></span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+</section>
+
+<!-- Scripts -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const images = document.querySelectorAll('img[data-fallback]');
+        images.forEach(img => {
+            img.addEventListener('error', function () {
+                if (this.src !== this.dataset.fallback) {
+                    this.src = this.dataset.fallback;
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,134 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Admin Dashboard - Event Horizon{% endblock %}
+
+{% block content %}
+<section class="py-5 mt-5">
+    <div class="container">
+        <h2 class="mb-4 text-navy">Event Dashboard</h2>
+
+        <ul class="nav nav-tabs mb-4" id="dashboardTabs" role="tablist">
+            <li class="nav-item">
+                <button class="nav-link active" id="bookings-tab" data-bs-toggle="tab" data-bs-target="#bookings"
+                    type="button">Bookings</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" id="custom-tab" data-bs-toggle="tab" data-bs-target="#custom"
+                    type="button">Custom Events</button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="dashboardTabContent">
+            <!-- Bookings Tab -->
+            <div class="tab-pane fade show active" id="bookings" role="tabpanel">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">Recent Bookings</h5>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Name</th>
+                                        <th>Type</th>
+                                        <th>Guests</th>
+                                        <th>Budget</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for booking in bookings %}
+                                    <tr>
+                                        <td>{{booking.created_at|date:"M d, Y" }}</td>
+                                        <td>
+                                            <div class="fw-bold">{{booking.name }}</div>
+                                            <small class="text-muted">{{booking.email }}</small>
+                                        </td>
+                                        <td>
+                                            {% if booking.event %}
+                                            <div class="fw-bold text-primary">{{booking.event.title }}</div>
+                                            <small class="text-muted">{{booking.event_type|title }}</small>
+                                            {% elif booking.event_name %}
+                                            <div class="fw-bold text-primary">{{booking.event_name }}</div>
+                                            <small class="text-muted">{{booking.event_type|title }}</small>
+                                            {% else %}
+                                            {{booking.event_type|title }}
+                                            {% endif %}
+                                        </td>
+                                        <td>{{booking.guest_count }}</td>
+                                        <td>{{booking.budget|title }}</td>
+                                        <td>
+                                            {% if booking.status == 'Confirmed' %}
+                                            <span class="badge bg-success">Confirmed</span>
+                                            {% elif booking.status == 'Rejected' %}
+                                            <span class="badge bg-danger">Rejected</span>
+                                            {% else %}
+                                            <span class="badge bg-warning text-dark">Pending</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted py-4">No bookings found.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Custom Events Tab -->
+            <div class="tab-pane fade" id="custom" role="tabpanel">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">Custom Event Designs</h5>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Created</th>
+                                        <th>Event Name</th>
+                                        <th>Type</th>
+                                        <th>Date</th>
+                                        <th>Est. Cost</th>
+                                        <th>Status</th>
+                                        <th>Location</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for event in custom_events %}
+                                    <tr>
+                                        <td>{{event.created_at|date:"M d, Y" }}</td>
+                                        <td>{{event.event_name }}</td>
+                                        <td>{{event.event_type|title }}</td>
+                                        <td>{{event.event_date }}</td>
+                                        <td class="fw-bold text-success">{{event.total_cost }}</td>
+                                        <td>
+                                            {% if event.status == 'Confirmed' %}
+                                            <span class="badge bg-success">Confirmed</span>
+                                            {% elif event.status == 'Rejected' %}
+                                            <span class="badge bg-danger">Rejected</span>
+                                            {% else %}
+                                            <span class="badge bg-warning text-dark">Pending</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{event.location }}</td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted py-4">No custom events found.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

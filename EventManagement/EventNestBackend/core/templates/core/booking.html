@@ -1,0 +1,1231 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Book Your Event - EventNest{% endblock %}
+
+{% block extra_css %}
+<!-- Confetti Library -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<style>
+    /* Booking Page Specific Styles */
+    :root {
+        --primary-bg: #F5F7FA;
+        --accent-cyan: #E11D48;
+        /* Red Theme */
+        --deep-navy: #0A1628;
+        --text-dark: #1E293B;
+        --text-light: #64748B;
+    }
+
+    body {
+        background-color: var(--primary-bg);
+        overflow-x: hidden;
+    }
+
+    .booking-container {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 0 20px;
+        perspective: 1000px;
+    }
+
+    .booking-wrapper {
+        background: white;
+        border-radius: 24px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+        display: flex;
+        min-height: 750px;
+        transition: transform 0.3s ease;
+    }
+
+    /* Left Side - Form */
+    .booking-form-section {
+        flex: 1.5;
+        padding: 60px;
+        position: relative;
+    }
+
+    /* Right Side - Visual Summary (Holographic Ticket Holder) */
+    .booking-summary-section {
+        flex: 1;
+        background: radial-gradient(circle at top right, #340c19, #0f172a);
+        color: white;
+        padding: 60px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Decorative particles on right side */
+    .booking-summary-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image:
+            radial-gradient(rgb(255 255 255 / 10%) 1px, transparent 1px),
+            radial-gradient(rgb(255 255 255 / 10%) 1px, transparent 1px);
+        background-position: 0 0, 25px 25px;
+        background-size: 50px 50px;
+        opacity: 0.3;
+    }
+
+    /* Steps Indicator */
+    .booking-steps {
+        display: flex;
+        gap: 30px;
+        margin-bottom: 50px;
+    }
+
+    .step-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        opacity: 0.4;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .step-item.active {
+        opacity: 1;
+        transform: translateX(5px);
+    }
+
+    .step-number {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: #E2E8F0;
+        color: var(--text-dark);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: 700;
+        font-size: 15px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .step-item.active .step-number {
+        background: var(--deep-navy);
+        color: var(--accent-cyan);
+        box-shadow: 0 0 0 4px rgba(225, 29, 72, 0.15);
+    }
+
+    .step-item.completed .step-number {
+        background: #10B981;
+        color: white;
+    }
+
+    .step-text {
+        font-weight: 600;
+        font-size: 0.95rem;
+        color: var(--text-dark);
+        letter-spacing: -0.01em;
+    }
+
+    /* Form Steps */
+    .form-step {
+        display: none;
+        animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .form-step.active {
+        display: block;
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Custom Inputs */
+    .form-label {
+        font-weight: 600;
+        color: var(--text-dark);
+        font-size: 0.9rem;
+        margin-bottom: 10px;
+    }
+
+    .form-control,
+    .form-select {
+        padding: 14px 18px;
+        border-radius: 12px;
+        border: 2px solid #E2E8F0;
+        background: #F8FAFC;
+        transition: all 0.2s ease;
+        font-size: 1rem;
+        box-shadow: none;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: var(--accent-cyan);
+        background: white;
+        box-shadow: 0 0 0 4px rgba(225, 29, 72, 0.1);
+        transform: translateY(-1px);
+    }
+
+    /* Magic Button */
+    .magic-wrapper {
+        position: relative;
+    }
+
+    .btn-magic {
+        position: absolute;
+        right: 10px;
+        top: 10px;
+        background: linear-gradient(135deg, #6366f1, #a855f7, #ec4899);
+        border: none;
+        color: white;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        z-index: 5;
+        font-size: 14px;
+        opacity: 0.8;
+    }
+
+    .btn-magic:hover {
+        opacity: 1;
+        transform: scale(1.1) rotate(15deg);
+        box-shadow: 0 5px 15px rgba(168, 85, 247, 0.4);
+    }
+
+    .magic-sparkle {
+        position: absolute;
+        pointer-events: none;
+        animation: sparkleAnim 1s ease forwards;
+        z-index: 10;
+        font-size: 14px;
+    }
+
+    @keyframes sparkleAnim {
+        0% {
+            transform: scale(0) translate(0, 0);
+            opacity: 1;
+        }
+
+        100% {
+            transform: scale(1.5) translate(var(--tx), var(--ty));
+            opacity: 0;
+        }
+    }
+
+    /* Event Type Cards */
+    .event-type-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .event-type-option {
+        position: relative;
+    }
+
+    .event-type-option input {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    .event-type-card {
+        border: 2px solid #E2E8F0;
+        border-radius: 16px;
+        padding: 24px 10px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        background: white;
+    }
+
+    .event-type-card i {
+        font-size: 28px;
+        margin-bottom: 12px;
+        color: var(--text-light);
+        transition: 0.3s;
+        display: block;
+    }
+
+    .event-type-option input:checked+.event-type-card {
+        border-color: var(--deep-navy);
+        background: rgba(225, 29, 72, 0.04);
+        transform: translateY(-4px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    .event-type-option input:checked+.event-type-card i {
+        color: var(--accent-cyan);
+        transform: scale(1.1);
+    }
+
+    /* Navigation */
+    .form-navigation {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 50px;
+    }
+
+    .btn-next {
+        background: var(--accent-cyan);
+        color: #ffffff;
+        padding: 14px 34px;
+        border-radius: 50px;
+        border: none;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.3s ease;
+        font-size: 1rem;
+    }
+
+    .btn-next:hover {
+        transform: translateX(5px);
+        box-shadow: 0 8px 20px rgba(225, 29, 72, 0.3);
+        background: #be123c;
+    }
+
+    .btn-prev {
+        background: transparent;
+        color: var(--text-light);
+        padding: 12px 30px;
+        border: none;
+        font-weight: 600;
+        transition: 0.3s;
+    }
+
+    .btn-prev:hover {
+        color: var(--deep-navy);
+    }
+
+    /* =========================================
+       HOLOGRAPHIC TICKET STYLES
+       ========================================= */
+    .ticket-container {
+        perspective: 1000px;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+    }
+
+    .summary-card-3d {
+        position: relative;
+        background: linear-gradient(135deg, #E11D48 0%, #881337 100%);
+        border-radius: 20px;
+        padding: 30px;
+        color: white;
+        transform-style: preserve-3d;
+        transform: rotateX(0deg) rotateY(0deg);
+        transition: transform 0.1s ease-out;
+        /* Smooth follow */
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Ticket Perforation Effect */
+    .summary-card-3d::after {
+        content: '';
+        position: absolute;
+        top: -10px;
+        left: 20px;
+        right: 20px;
+        height: 10px;
+        background-image: radial-gradient(circle, transparent 7px, #E11D48 8px);
+        background-size: 20px 20px;
+        background-position: bottom;
+        opacity: 0.8;
+    }
+
+    /* Sheen Effect */
+    .holographic-sheen {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(125deg,
+                transparent 0%,
+                rgba(255, 255, 255, 0.0) 30%,
+                rgba(255, 255, 255, 0.1) 40%,
+                rgba(255, 255, 255, 0.2) 50%,
+                rgba(255, 255, 255, 0.1) 60%,
+                rgba(255, 255, 255, 0.0) 70%,
+                transparent 100%);
+        z-index: 10;
+        pointer-events: none;
+        border-radius: 20px;
+        opacity: 0.8;
+        transform: translateZ(20px);
+        /* Lift sheen */
+    }
+
+    .summary-content {
+        transform: translateZ(30px);
+        /* Deep content */
+        position: relative;
+        z-index: 5;
+    }
+
+    .summary-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.8rem;
+        color: #ffffff;
+        margin-bottom: 40px;
+        text-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        transform: translateZ(10px);
+    }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 16px;
+        font-size: 1rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding-bottom: 8px;
+    }
+
+    .summary-row:last-child {
+        border: none;
+    }
+
+    .summary-row span:first-child {
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    /* Mobile */
+    @media (max-width: 992px) {
+        .booking-wrapper {
+            flex-direction: column;
+        }
+
+        .booking-summary-section {
+            padding: 40px;
+            order: 0;
+            min-height: auto;
+        }
+
+        .summary-card-3d {
+            transform: none !important;
+            /* Disable 3D on mobile */
+        }
+
+        .ticket-container {
+            height: auto;
+        }
+    }
+
+    /* Success Modal Styles */
+    .modal-content.success-modal {
+        border-radius: 24px;
+        border: none;
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+    }
+
+    .success-icon-container {
+        padding: 40px 0;
+        background: linear-gradient(135deg, #E11D48, #9F1239);
+        color: white;
+        text-align: center;
+    }
+
+    .success-checkmark {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: block;
+        stroke-width: 2;
+        stroke: #fff;
+        stroke-miterlimit: 10;
+        box-shadow: inset 0px 0px 0px #fff;
+        animation: fill .4s ease-in-out .4s forwards, scale .3s ease-in-out .9s both;
+        margin: 0 auto;
+    }
+
+    .success-checkmark__circle {
+        stroke-dasharray: 166;
+        stroke-dashoffset: 166;
+        stroke-width: 2;
+        stroke-miterlimit: 10;
+        stroke: #fff;
+        fill: none;
+        animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+    }
+
+    .success-checkmark__check {
+        transform-origin: 50% 50%;
+        stroke-dasharray: 48;
+        stroke-dashoffset: 48;
+        animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+    }
+
+    @keyframes stroke {
+        100% {
+            stroke-dashoffset: 0;
+        }
+    }
+
+    @keyframes scale {
+
+        0%,
+        100% {
+            transform: none;
+        }
+
+        50% {
+            transform: scale3d(1.1, 1.1, 1);
+        }
+    }
+
+    @keyframes fill {
+        100% {
+            box-shadow: inset 0px 0px 0px 40px rgba(255, 255, 255, 0.2);
+        }
+    }
+
+    .modal-close-btn {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 40px;
+        height: 40px;
+        background: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        z-index: 1050;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .modal-close-btn:hover {
+        transform: scale(1.1);
+        background: #f8f9fa;
+    }
+
+    .modal-close-btn i {
+        color: #E11D48;
+        font-size: 1.2rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="booking-container">
+    <div class="booking-wrapper">
+        <!-- Left Side: Form -->
+        <div class="booking-form-section">
+            <!-- Messages / Errors -->
+            {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+            {% endif %}
+
+            {% if error %}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <strong>Error:</strong> {{ error }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endif %}
+
+            {% if success %}
+            <!-- Removed standard alert, replaced by Modal -->
+            {% endif %}
+
+            <!-- Steps Header -->
+            <div class="booking-steps">
+                <div class="step-item active" id="step1-indicator">
+                    <div class="step-number">1</div>
+                    <div class="step-text">Event Details</div>
+                </div>
+                <div class="step-item" id="step2-indicator">
+                    <div class="step-number">2</div>
+                    <div class="step-text">Personal Info</div>
+                </div>
+                <div class="step-item" id="step3-indicator">
+                    <div class="step-number">3</div>
+                    <div class="step-text">Confirm</div>
+                </div>
+            </div>
+
+            <form id="bookingForm" method="POST" action="{% url 'booking' %}">
+                {% csrf_token %}
+                <input type="hidden" name="budget" id="budgetInput">
+
+
+                {% if event %}
+                <input type="hidden" name="event_type" value="{{ event.category }}">
+                <input type="hidden" name="event_date" id="eventDate" value="{{ event.date|date:'Y-m-d' }}">
+                {% elif package %}
+                <input type="hidden" name="event_type" value="Package: {{ package.name }}">
+                {% endif %}
+
+                <!-- Step 1: Event Details -->
+                <div class="form-step active" id="step1">
+                    {% if event %}
+                    <div class="text-center mb-4">
+                        <h3 class="fw-bold" style="color: var(--deep-navy);">Booking: {{ event.title }}</h3>
+                        <p class="text-muted"><i class="far fa-calendar-alt me-2"></i>{{ event.date|date:"F d, Y" }}</p>
+                        <div class="d-inline-block px-3 py-1 rounded-pill bg-light border">
+                            <span class="fw-bold text-navy">Price: {{ event.price|default:'Free' }}</span>
+                        </div>
+                    </div>
+                    {% elif package %}
+                    <div class="text-center mb-4">
+                        <h3 class="fw-bold" style="color: var(--deep-navy);">Package: {{ package.name }}</h3>
+                        <p class="text-muted">{{ package.description|truncatewords:20 }}</p>
+                        <div class="d-inline-block px-3 py-1 rounded-pill bg-light border">
+                            <span class="fw-bold text-navy">Starting at: {{ package.price_start }}</span>
+                        </div>
+                    </div>
+                    {% else %}
+                    <h3 class="mb-4 fw-bold" style="color: var(--deep-navy);">Select Event Category</h3>
+                    <div class="event-type-grid">
+                        <label class="event-type-option">
+                            <input type="radio" name="event_type" value="Concert" onchange="updateSummary()" checked>
+                            <div class="event-type-card">
+                                <i class="fas fa-music"></i>
+                                <div>Concert</div>
+                            </div>
+                        </label>
+                        <label class="event-type-option">
+                            <input type="radio" name="event_type" value="Workshop" onchange="updateSummary()">
+                            <div class="event-type-card">
+                                <i class="fas fa-paint-brush"></i>
+                                <div>Workshop</div>
+                            </div>
+                        </label>
+                        <label class="event-type-option">
+                            <input type="radio" name="event_type" value="Comedy" onchange="updateSummary()">
+                            <div class="event-type-card">
+                                <i class="fas fa-microphone-alt"></i>
+                                <div>Comedy</div>
+                            </div>
+                        </label>
+                        <label class="event-type-option">
+                            <input type="radio" name="event_type" value="Sports" onchange="updateSummary()">
+                            <div class="event-type-card">
+                                <i class="fas fa-running"></i>
+                                <div>Sports</div>
+                            </div>
+                        </label>
+                        <label class="event-type-option">
+                            <input type="radio" name="event_type" value="Theatre" onchange="updateSummary()">
+                            <div class="event-type-card">
+                                <i class="fas fa-theater-masks"></i>
+                                <div>Theatre</div>
+                            </div>
+                        </label>
+                        <label class="event-type-option">
+                            <input type="radio" name="event_type" value="Other" onchange="updateSummary()">
+                            <div class="event-type-card">
+                                <i class="fas fa-star"></i>
+                                <div>Other</div>
+                            </div>
+                        </label>
+                    </div>
+                    {% endif %}
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-{% if event %}12{% else %}6{% endif %}">
+                            <label class="form-label">Number of Tickets / Guests</label>
+                            <input type="number" name="guest_count" class="form-control" id="guestCount"
+                                placeholder="Number of Tickets" min="1" required oninput="updateSummary()">
+                        </div>
+                        {% if not event %}
+                        <div class="col-md-6">
+                            <label class="form-label">Preferred Date</label>
+                            <input type="date" name="event_date" class="form-control" id="eventDate" required
+                                onchange="updateSummary()">
+                        </div>
+                        {% endif %}
+                    </div>
+
+
+                    <div class="mb-4">
+                        <label class="form-label">Seating Preference</label>
+                        <select class="form-select" name="venue_preference" onchange="updateSummary()">
+                            <option value="General Admission" selected>General Admission (Standard)</option>
+                            <option value="VIP Section">VIP Section (+₹500)</option>
+                            <option value="Front Row">Front Row (+₹1000)</option>
+                            <option value="Balcony">Balcony View</option>
+                            <option value="Accessible">Accessible Seating</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label d-block mb-2">Add-on Services</label>
+                        <div class="d-flex flex-wrap gap-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="services[]"
+                                    value="Fast Track Entry" id="service1" onchange="updateSummary()">
+                                <label class="form-check-label" for="service1">Fast Track Entry</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="services[]" value="Drink Package"
+                                    id="service2" onchange="updateSummary()">
+                                <label class="form-check-label" for="service2">Drink Package</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="services[]" value="Parking Pass"
+                                    id="service3" onchange="updateSummary()">
+                                <label class="form-check-label" for="service3">Parking Pass</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="services[]" value="Merchandise"
+                                    id="service4" onchange="updateSummary()">
+                                <label class="form-check-label" for="service4">Merchandise</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-navigation justify-content-end">
+                        <button type="button" class="btn-next" onclick="nextStep(2)">Next <i
+                                class="fas fa-arrow-right"></i></button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Personal Info -->
+                <div class="form-step" id="step2">
+                    <h3 class="mb-4 fw-bold" style="color: var(--deep-navy);">Attendee Details</h3>
+
+                    <div class="mb-3">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" name="name" class="form-control" id="userName" placeholder="Full Name"
+                            required value="{{ request.user.first_name }} {{ request.user.last_name }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" name="email" class="form-control" id="userEmail" required
+                            placeholder="Email Address" value="{{ request.user.email }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Phone Number</label>
+                        <input type="tel" name="phone" class="form-control" id="userPhone" placeholder="Phone Number"
+                            value="{{ request.user.profile.phone_number }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Special Requests / Notes</label>
+                        <textarea name="vision" class="form-control" rows="3"
+                            placeholder="Special Requests or Notes"></textarea>
+                    </div>
+
+                    <div class="form-navigation">
+                        <button type="button" class="btn-prev" onclick="prevStep(1)">Back</button>
+                        <button type="button" class="btn-next" onclick="nextStep(3)">Next <i
+                                class="fas fa-arrow-right"></i></button>
+                    </div>
+                </div>
+
+                <!-- Step 3: Payment/Confirm -->
+                <div class="form-step" id="step3">
+                    <h3 class="mb-4 fw-bold" style="color: var(--deep-navy);">Payment & Confirm</h3>
+
+                    <div class="alert alert-info border-0 bg-soft-cyan mb-4"
+                        style="background: rgba(225, 29, 72, 0.1); color: var(--deep-navy);">
+                        <i class="fas fa-info-circle me-2"></i> No payment required for reservation. Pay at venue.
+                    </div>
+
+                    <div class="d-flex flex-column gap-3 mb-4">
+                        <label class="form-control d-flex align-items-center gap-3" style="cursor: pointer;">
+                            <input type="radio" name="payment" value="venue" checked>
+                            <i class="fas fa-money-bill-wave text-success fs-5"></i>
+                            <div>
+                                <div class="fw-bold">Pay at Venue</div>
+                                <small class="text-muted">Cash or Card accepted</small>
+                            </div>
+                        </label>
+                        <label class="form-control d-flex align-items-center gap-3" style="cursor: pointer;">
+                            <input type="radio" name="payment" value="card">
+                            <i class="fas fa-credit-card text-primary fs-5"></i>
+                            <div>
+                                <div class="fw-bold">Credit/Debit Card</div>
+                                <small class="text-muted">Process secure payment now</small>
+                            </div>
+                        </label>
+                    </div>
+
+                    <div class="form-check mb-4">
+                        <input class="form-check-input" type="checkbox" id="terms" checked>
+                        <label class="form-check-label small text-muted" for="terms">
+                            I agree to the <a href="#" class="text-decoration-none">Terms & Conditions</a>
+                        </label>
+                    </div>
+
+                    <div class="form-navigation">
+                        <button type="button" class="btn-prev" onclick="prevStep(2)">Back</button>
+                        <button type="submit" class="btn-next" style="width: 100%; justify-content: center;">Confirm
+                            Booking</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Right Side: Summary (3D Ticket) -->
+        <div class="booking-summary-section" id="ticketSection">
+            <div>
+                <h2 class="summary-title" style="pointer-events: none;">Your<br>Experience</h2>
+                <p style="opacity: 0.8; line-height: 1.6; pointer-events: none;">"Experience is not what happens to you;
+                    it's what you do
+                    with what happens to you."</p>
+            </div>
+
+            <div class="ticket-container">
+                <div class="summary-card-3d" id="summaryCard">
+                    <div class="holographic-sheen"></div>
+                    <div class="summary-content">
+                        <h5 class="fw-bold mb-4 border-bottom border-white pb-2 text-white opacity-75">TICKET SUMMARY
+                        </h5>
+                        <div class="summary-row">
+                            <span>Event Type</span>
+                            <span id="summaryType" class="fw-bold">Other</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Date</span>
+                            <span id="summaryDate">Not Selected</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Guests</span>
+                            <span id="summaryGuests">--</span>
+                        </div>
+                        <div class="mt-4 pt-3 border-top border-white d-flex justify-content-between align-items-center"
+                            style="border-top: 1px dashed white !important;">
+                            <span class="text-white opacity-75">Total Est.</span>
+                            <span class="fs-4 fw-bold text-white">₹<span id="summaryPrice">0</span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Success Modal -->
+<div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content success-modal shadow-lg">
+            <button type="button" class="modal-close-btn" data-bs-dismiss="modal" aria-label="Close">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="success-icon-container">
+                <svg class="success-checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                    <circle class="success-checkmark__circle" cx="26" cy="26" r="25" fill="none" />
+                    <path class="success-checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+                </svg>
+                <h3 class="mt-3 fw-bold">Booking Confirmed!</h3>
+            </div>
+            <div class="modal-body text-center p-5">
+                <p class="text-muted mb-4" style="font-size: 1.1rem;">
+                    Thank you, <span class="fw-bold text-navy" id="modalUserName">{{ booking_name|default:'Guest'
+                        }}</span>!
+                    Your spot for the event is secured.
+                </p>
+                <div class="p-3 bg-light rounded-3 mb-4 text-start border">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Event Date:</span>
+                        <span class="fw-bold text-navy" id="modalEventDate">{{ booking_date|default:'TBD' }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted">Tickets:</span>
+                        <span class="fw-bold text-navy" id="modalTicketCount">{{ booking_guests|default:0 }}
+                            People</span>
+                    </div>
+                </div>
+                <p class="small text-muted mb-4">A confirmation email has been sent to <br><strong
+                        id="modalUserEmail">{{ booking_email|default:'' }}</strong></p>
+                <button type="button" class="btn btn-navy w-100 py-3 rounded-pill fw-bold" data-bs-dismiss="modal"
+                    style="background: var(--deep-navy); color: white;">
+                    Great, thanks!
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Authentication Required Modal -->
+<div class="modal fade" id="authRequiredModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+            <div class="modal-header border-0 bg-light">
+                <h5 class="modal-title fw-bold text-navy">Login Required</h5>
+            </div>
+            <div class="modal-body text-center p-5">
+                <div class="mb-4">
+                    <i class="fas fa-ticket-alt fa-3x text-danger"></i>
+                </div>
+                <h4 class="fw-bold mb-3">Ready to Book?</h4>
+                <p class="text-muted mb-4">
+                    Please sign in to complete your booking. This helps us manage your reservations and send you
+                    updates.
+                </p>
+                <div class="d-grid gap-3">
+                    <a href="{% url 'login' %}?next={{ request.path }}&event={{ prefilled_event }}"
+                        class="btn btn-primary py-3 fw-bold rounded-pill"
+                        style="background: linear-gradient(135deg, #E11D48 0%, #BE123C 100%); border: none;">
+                        Sign In to Book
+                    </a>
+                    <a href="{% url 'register' %}?next={{ request.path }}"
+                        class="btn btn-outline-secondary py-3 fw-bold rounded-pill">
+                        Create Account
+                    </a>
+                </div>
+                <div class="mt-4">
+                    <a href="{% url 'events' %}" class="text-decoration-none text-muted small">
+                        <i class="fas fa-arrow-left me-1"></i> browse more events
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // --- 1. Step Wizard Logic ---
+    let currentStep = 1;
+
+    function nextStep(step) {
+        // Validation
+        if (step === 2) {
+            const guests = document.getElementById('guestCount').value;
+            const date = document.getElementById('eventDate').value;
+            if (!guests || !date) {
+                alert("Please fill in all required fields (Guests & Date).");
+                return;
+            }
+        }
+
+        if (step === 3) {
+            const name = document.getElementById('userName').value;
+            const email = document.getElementById('userEmail').value;
+            if (!name || !email) {
+                alert("Please enter your name and email.");
+                return;
+            }
+        }
+
+        document.querySelectorAll('.form-step').forEach(el => el.classList.remove('active'));
+        document.getElementById(`step${step}`).classList.add('active');
+
+        // Update Indicators
+        document.getElementById(`step${step}-indicator`).classList.add('active');
+        document.getElementById(`step${currentStep}-indicator`).classList.add('completed');
+
+        currentStep = step;
+    }
+
+    function prevStep(step) {
+        document.querySelectorAll('.form-step').forEach(el => el.classList.remove('active'));
+        document.getElementById(`step${step}`).classList.add('active');
+
+        // Update Indicators
+        document.getElementById(`step${currentStep}-indicator`).classList.remove('active');
+
+        currentStep = step;
+    }
+
+    function updateSummary() {
+        // 1. Get current inputs
+        // Check if event is pre-filled (hidden inputs)
+        const eventTypeHidden = document.querySelector('input[name="event_type"][type="hidden"]');
+        const eventDateHidden = document.querySelector('input[name="event_date"][type="hidden"]');
+
+        let type = 'Other';
+        let dateText = 'Not Selected';
+
+        if (eventTypeHidden) {
+            type = eventTypeHidden.value;
+        } else {
+            const typeInput = document.querySelector('input[name="event_type"]:checked');
+            if (typeInput) type = typeInput.value;
+        }
+
+        if (eventDateHidden) {
+            dateText = eventDateHidden.value;
+        } else {
+            const dInput = document.getElementById('eventDate');
+            if (dInput) dateText = dInput.value;
+        }
+
+        const guests = parseInt(document.getElementById('guestCount').value) || 1;
+
+        // 2. Update basic text info
+        const typeDest = document.getElementById('summaryType');
+        if (typeDest) typeDest.textContent = type;
+
+        const guestsDest = document.getElementById('summaryGuests');
+        if (guestsDest) guestsDest.textContent = guests;
+
+        const dateDest = document.getElementById('summaryDate');
+        if (dateDest) dateDest.textContent = dateText || 'Not Selected';
+
+
+        // 3. Robust Price Calculation
+        let basePrice = 0;
+        const eventTitle = "{{ event.title|default:''|escapejs }}";
+        const contextPriceStr = "{{ event.price|default:''|escapejs }}";
+        const packagePriceStr = "{{ package.price_start|default:''|escapejs }}";
+
+        // Fallback prices based on category
+        const categoryFallbacks = {
+            'Concert': 2000,
+            'Workshop': 1200,
+            'Comedy': 800,
+            'Sports': 1500,
+            'Theatre': 1000,
+            'Other': 500
+        };
+
+        // Attempt to parse price from event context
+        let parsedContextPrice = 0;
+        if (contextPriceStr) {
+            let cleanStr = contextPriceStr.toLowerCase();
+            let firstDigitIdx = cleanStr.search(/\d/);
+            if (firstDigitIdx !== -1) {
+                let numericPart = cleanStr.substring(firstDigitIdx).replace(/[^\d.]/g, '');
+                parsedContextPrice = parseFloat(numericPart) || 0;
+                // Handle 'k' multiplier
+                if (cleanStr.includes('k') && parsedContextPrice < 100) {
+                    parsedContextPrice *= 1000;
+                }
+            }
+        }
+
+        // Attempt to parse price from package context
+        let parsedPackagePrice = 0;
+        if (packagePriceStr) {
+            let cleanStr = packagePriceStr.toLowerCase();
+            let firstDigitIdx = cleanStr.search(/\d/);
+            if (firstDigitIdx !== -1) {
+                let numericPart = cleanStr.substring(firstDigitIdx).replace(/[^\d.]/g, '');
+                parsedPackagePrice = parseFloat(numericPart) || 0;
+                if (cleanStr.includes('k') && parsedPackagePrice < 100) {
+                    parsedPackagePrice *= 1000;
+                }
+            }
+        }
+
+        if (eventTitle && parsedContextPrice > 0) {
+            // Use price from pre-filled event if valid
+            basePrice = parsedContextPrice;
+        } else if (parsedPackagePrice > 0) {
+            basePrice = parsedPackagePrice;
+        } else {
+            // Fallback to category price
+            basePrice = categoryFallbacks[type] || 500;
+        }
+
+
+        // Add VIP/Seating cost
+        const seatPref = document.querySelector('select[name="venue_preference"]');
+        if (seatPref) {
+            const val = seatPref.value;
+            if (val === 'VIP Section') basePrice += 500;
+            if (val === 'Front Row') basePrice += 1000;
+        }
+
+        // Add Service Costs
+        let servicesCost = 0;
+        const serviceCheckboxes = document.querySelectorAll('input[name="services[]"]:checked');
+        serviceCheckboxes.forEach(cb => {
+            const val = cb.value;
+            if (val === 'Fast Track Entry') servicesCost += 300;
+            if (val === 'Drink Package') servicesCost += 500;
+            if (val === 'Parking Pass') servicesCost += 200;
+            if (val === 'Merchandise') servicesCost += 800;
+        });
+
+        const totalPrice = (guests * basePrice) + servicesCost;
+        const formattedPrice = `Rs. ${Math.round(totalPrice).toLocaleString('en-IN')}`;
+
+        // Update UI
+        const priceDest = document.getElementById('summaryPrice');
+        if (priceDest) priceDest.textContent = Math.round(totalPrice).toLocaleString('en-IN');
+
+        // Update Hidden Input for Database Persistence
+        const bInput = document.getElementById('budgetInput');
+        if (bInput) bInput.value = formattedPrice;
+    }
+
+    // --- 2. Initialization & UI Syncing ---
+    document.addEventListener('DOMContentLoaded', function () {
+        const eventCategory = "{{ event.category|default:''|escapejs }}";
+
+        if (eventCategory) {
+            // Try to find and select the matching radio button
+            const radios = document.querySelectorAll('input[name="event_type"]');
+            radios.forEach(radio => {
+                if (radio.value.toLowerCase() === eventCategory.toLowerCase()) {
+                    radio.checked = true;
+                }
+            });
+        }
+
+        // Setup Date Input Min Value
+        const dateInput = document.getElementById('eventDate');
+        if (dateInput) {
+            // Use local date to avoid timezone issues (toISOString returns UTC)
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const today = `${year}-${month}-${day}`;
+            dateInput.setAttribute('min', today);
+        }
+
+        // Trigger initial summary population
+        updateSummary();
+
+        // Handle Success Modal
+        const isSuccess = "{{ success|yesno:'true,false' }}" === "true";
+        if (isSuccess) {
+            setTimeout(() => {
+                const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+                successModal.show();
+                triggerConfetti();
+            }, 500);
+        }
+
+        // Authentication Check
+        const isAuthenticated = "{{ user.is_authenticated|yesno:'true,false' }}" === "true";
+        if (!isAuthenticated) {
+            const authModal = new bootstrap.Modal(document.getElementById('authRequiredModal'), {
+                backdrop: 'static',
+                keyboard: false
+            });
+            authModal.show();
+        }
+    });
+
+    // --- 2.5 AJAX Form Submission for Modal ---
+    const bookingForm = document.getElementById('bookingForm');
+    if (bookingForm) {
+        bookingForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const submitBtn = bookingForm.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+            const formData = new FormData(bookingForm);
+
+            fetch(bookingForm.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnText;
+
+                    if (data.status === 'success') {
+                        // Populate Modal Content from Form Inputs
+                        const nameVal = document.getElementById('userName').value || 'there';
+                        document.getElementById('modalUserName').textContent = nameVal;
+
+                        const dateVal = document.getElementById('eventDate').value;
+                        document.getElementById('modalEventDate').textContent = dateVal || 'Selected Date';
+
+                        const guestVal = document.getElementById('guestCount').value;
+                        document.getElementById('modalTicketCount').textContent = guestVal + ' People';
+
+                        const emailVal = document.getElementById('userEmail').value;
+                        document.getElementById('modalUserEmail').textContent = emailVal;
+
+                        // Show Modal
+                        const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+                        successModal.show();
+                        triggerConfetti();
+                    } else {
+                        // Show Error
+                        alert(data.message || 'An error occurred during booking.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnText;
+                    alert('Network error. Please try again.');
+                });
+        });
+    }
+
+    // --- 3. Holographic 3D Tilt Effect ---
+    const ticketSection = document.getElementById('ticketSection');
+    const card = document.getElementById('summaryCard');
+
+    if (window.innerWidth > 992) {
+        ticketSection.addEventListener('mousemove', (e) => {
+            const rect = ticketSection.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            // Calculate center
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+
+            // Calculate tilt (limit to 10deg)
+            const rotateX = ((y - centerY) / centerY) * -10;
+            const rotateY = ((x - centerX) / centerX) * 10;
+
+            card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+        });
+
+        ticketSection.addEventListener('mouseleave', () => {
+            card.style.transform = `rotateX(0deg) rotateY(0deg)`;
+        });
+    }
+
+    // --- 4. Magic Vision AI Writer ---
+
+
+    // --- 5. Confetti Celebration ---
+    function triggerConfetti(e) {
+        try {
+            confetti({
+                particleCount: 150,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#E11D48', '#ffffff', '#FDE047']
+            });
+        } catch (err) {
+            console.log("Confetti effect skipped", err);
+        }
+        return true;
+    }
+</script>
+{% endblock %}

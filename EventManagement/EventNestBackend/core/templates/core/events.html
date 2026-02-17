@@ -1,0 +1,250 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+
+{% block title %}Events - EventNest{% endblock %}
+
+{% block main_class %}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'core/css/events.css' %}?v=10">
+<style>
+    /* Student-like Page Specific Overrides for Events */
+
+    .event-category-badge {
+        background: #E11D48 !important;
+        /* Red Theme */
+        color: #ffffff !important;
+    }
+
+    .like-btn {
+        color: white;
+        transition: color 0.3s ease;
+    }
+
+    .like-btn.liked {
+        color: #E11D48 !important;
+    }
+
+    .book-btn {
+        background-color: #E11D48 !important;
+        color: white !important;
+    }
+
+    .modal-close-btn {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 40px;
+        height: 40px;
+        background: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        z-index: 1050;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .modal-close-btn:hover {
+        transform: scale(1.1);
+        background: #f8f9fa;
+    }
+
+    .modal-close-btn i {
+        color: #ff0000;
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section">
+    <div class="hero-content">
+        <h1>Discover Your Perfect Event</h1>
+        <p>Explore our wide range of premium event management services crafted just for you.</p>
+        <form class="search-container" method="GET" action="{% url 'events' %}">
+            <input type="text" name="q" id="eventSearch" placeholder="Search Events"
+                value="{{request.GET.q|default:'' }}">
+            <i class="fas fa-search search-icon"></i>
+            <button type="button" id="clearSearch" class="btn-clear-search {% if not request.GET.q %}d-none{% endif %}">
+                <i class="fas fa-times"></i>
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Filters & Categories -->
+<div class="container mb-4">
+
+
+    <div class="category-tabs-container" id="category-tabs">
+        <a href="?{% if current_sort %}sort={{current_sort }}{% endif %}{% if active_city %}&city={{active_city }}{% endif %}"
+            class="category-tab {% if not selected_categories %}active{% endif %}" style="text-decoration: none;">
+            All
+        </a>
+
+        {% for cat in all_categories %}
+        <a href="?categories={{cat }}{% if current_sort %}&sort={{current_sort }}{% endif %}{% if active_city %}&city={{active_city }}{% endif %}"
+            class="category-tab {% if cat in selected_categories %}active{% endif %}" style="text-decoration: none;">
+            {{cat }}
+        </a>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Main Content Area -->
+<div class="events-page-container">
+    <div class="events-grid" id="events-container">
+        {% for event in events_list %}
+        <div class="event-card" data-category="{{event.category }}" data-name="{{event.title|lower }}"
+            onclick="openEventModal(this)" data-title="{{event.title }}" data-image="{{event.get_image_url }}"
+            data-date="{{event.date|date:'M d, Y' }}" data-location="{{event.location|default:'TBD' }}"
+            data-price="{{event.get_clean_price }}" data-description="{{event.description }}">
+            <div class="card-image-container" style="position: relative;">
+                {% if event.get_image_url %}
+                <img src="{{event.get_image_url }}{% if '?' in event.get_image_url %}&{% else %}?{% endif %}v={{event.id }}"
+                    alt="{{event.title }}" class="card-img-top">
+                {% else %}
+                <img src="{% static 'core/images/cat_'|add:event.category|lower|add:'.png' %}" alt="{{event.title }}"
+                    class="card-img-top" onerror="handleImageError(this)">
+                {% endif %}
+
+                <!-- Like Button -->
+                <button
+                    class="btn btn-link position-absolute top-0 end-0 p-3 like-btn {% if event.id in liked_event_ids %}liked{% endif %}"
+                    data-event-id="{{event.id }}" onclick="toggleLike(this, '{{event.id }}')" style="z-index: 10;">
+                    <i class="{% if event.id in liked_event_ids %}fas{% else %}far{% endif %} fa-heart fa-lg"
+                        style="filter: drop-shadow(0 0 2px rgba(0,0,0,0.5));"></i>
+                </button>
+
+                <!-- Rating Overlay / New Badge -->
+                <div class="rating-overlay">
+                    <i class="fas fa-star"></i>
+                    <span>New</span>
+                </div>
+            </div>
+            <div class="card-content">
+                <div>
+                    <h3 class="event-name">{{event.title }}</h3>
+                    <p class="event-genre">{{event.category|upper }}</p>
+                    <p class="event-date text-muted"><i class="far fa-calendar me-2"></i>{{event.date|date:"M d, Y" }}
+                    </p>
+                    <p class="event-price text-success fw-bold">{{event.get_clean_price }}</p>
+                </div>
+                <div class="card-actions">
+                    <a href="{% url 'event_detail' event.id %}" class="view-btn">View</a>
+                    <a href="{% url 'booking' %}?event={{event.title }}" class="book-btn">Book</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-5">
+            <h3 class="text-white">No events found at the moment.</h3>
+            <p class="text-secondary">Please check back later.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Pagination -->
+{% if page_obj.paginator.num_pages > 1 %}
+<div class="container mb-5">
+    <div class="pagination-container">
+        <!-- Previous Page -->
+        {% if page_obj.has_previous %}
+        <a href="?page={{page_obj.previous_page_number }}{% if request.GET.q %}&q={{request.GET.q }}{% endif %}{% for cat in selected_categories %}&categories={{cat }}{% endfor %}{% if active_city %}&city={{active_city }}{% endif %}{% if current_sort %}&sort={{current_sort }}{% endif %}"
+            class="page-btn"><i class="fas fa-chevron-left"></i></a>
+        {% else %}
+        <span class="page-btn disabled"><i class="fas fa-chevron-left"></i></span>
+        {% endif %}
+
+        <!-- Page Numbers -->
+        <!-- Page Numbers -->
+        {% for num in custom_page_range %}
+        {% if num == page_obj.paginator.ELLIPSIS %}
+        <span class="page-ellipsis">...</span>
+        {% elif page_obj.number == num %}
+        <span class="page-btn active">{{num }}</span>
+        {% else %}
+        <a href="?page={{num }}{% if request.GET.q %}&q={{request.GET.q }}{% endif %}{% for cat in selected_categories %}&categories={{cat }}{% endfor %}{% if active_city %}&city={{active_city }}{% endif %}{% if current_sort %}&sort={{current_sort }}{% endif %}"
+            class="page-btn">{{num }}</a>
+        {% endif %}
+        {% endfor %}
+
+        <!-- Next Page -->
+        {% if page_obj.has_next %}
+        <a href="?page={{page_obj.next_page_number }}{% if request.GET.q %}&q={{request.GET.q }}{% endif %}{% for cat in selected_categories %}&categories={{cat }}{% endfor %}{% if active_city %}&city={{active_city }}{% endif %}{% if current_sort %}&sort={{current_sort }}{% endif %}"
+            class="page-btn"><i class="fas fa-chevron-right"></i></a>
+        {% else %}
+        <span class="page-btn disabled"><i class="fas fa-chevron-right"></i></span>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Event Details Modal (Standardized Bootstrap Modal) -->
+<div class="modal fade" id="eventDetailsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg overflow-hidden" style="border-radius: 20px;">
+            <div class="modal-body p-0">
+                <!-- Modal Hero -->
+                <div style="position: relative; height: 300px;">
+                    <img id="modalImage" src="" alt="Event" style="width: 100%; height: 100%; object-fit: cover;">
+                    <button type="button" class="modal-close-btn" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="fas fa-times"></i>
+                    </button>
+
+                    <div
+                        style="position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(to top, rgba(10,22,40,0.9), transparent); padding: 20px;">
+                        <span id="modalCategory" class="badge text-white mb-2"
+                            style="background-color: #E11D48;">Category</span>
+                        <h2 id="modalTitle" class="text-white fw-bold mb-0">Event Title</h2>
+                    </div>
+                </div>
+
+                <!-- Modal Content -->
+                <div class="p-4 bg-white">
+                    <div class="row align-items-center mb-4">
+                        <div class="col-8">
+                            <div class="d-flex align-items-center text-secondary mb-2">
+                                <i class="far fa-calendar-alt me-2" style="color: #E11D48;"></i>
+                                <span id="modalDate" class="fw-medium">Date</span>
+                            </div>
+                            <div class="d-flex align-items-center text-secondary">
+                                <i class="fas fa-map-marker-alt me-2" style="color: #E11D48;"></i>
+                                <span id="modalLocation">Venue Details</span>
+                            </div>
+                        </div>
+                        <div class="col-4 text-end">
+                            <div class="fs-3 fw-bold text-dark" id="modalPrice">?0</div>
+                        </div>
+                    </div>
+
+                    <p id="modalDescription" class="text-secondary mb-4">
+                        Event details will appear here...
+                    </p>
+
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'booking' %}" id="modalBookLink" class="btn py-3 fw-bold rounded-pill"
+                            style="background: #E11D48; color: #fff; text-decoration: none; display: flex; align-items: center; justify-content: center;">
+                            Book Now <i class="fas fa-arrow-right ms-2"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'core/js/events.js' %}"></script>
+
+{% endblock %}

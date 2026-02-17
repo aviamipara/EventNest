@@ -1,0 +1,149 @@
+{% load static %}
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <div class="row gy-4">
+            <div class="col-lg-4 col-md-6">
+                <h5 class="fw-bold mb-3">EventNest</h5>
+                <p class="text-silver-gray">We transform your ideas into unforgettable experiences. Your vision, our
+                    expertise.</p>
+                <div class="d-flex gap-3 mt-4">
+                    <a href="https://facebook.com/eventnest" target="_blank" class="text-silver-gray"><i
+                            class="fab fa-facebook-f fa-lg"></i></a>
+                    <a href="https://twitter.com/eventnest" target="_blank" class="text-silver-gray"><i
+                            class="fab fa-twitter fa-lg"></i></a>
+                    <a href="https://instagram.com/eventnest" target="_blank" class="text-silver-gray"><i
+                            class="fab fa-instagram fa-lg"></i></a>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-6">
+                <h5 class="fw-bold mb-3">Quick Links</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><a href="{% url 'index' %}">Home</a></li>
+                    <li class="mb-2"><a href="{% url 'events' %}">Our Events</a></li>
+                    <li class="mb-2"><a href="{% url 'gallery' %}">Gallery</a></li>
+                    <li class="mb-2"><a href="{% url 'custom_event' %}">Custom Event</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <h5 class="fw-bold mb-3">Contact Us</h5>
+                <ul class="list-unstyled text-silver-gray">
+                    <li class="mb-2"><i class="fas fa-map-marker-alt me-2 text-ocean-blue"></i> Event Street, Mumbai,
+                        India</li>
+                    <li class="mb-2"><i class="fas fa-phone me-2 text-ocean-blue"></i> +91 98765 43210</li>
+                    <li class="mb-2"><i class="fas fa-envelope me-2 text-ocean-blue"></i> support@eventnest.com</li>
+                </ul>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <h5 class="fw-bold mb-3">Newsletter</h5>
+                <p class="text-silver-gray small">Subscribe to get the latest updates and offers.</p>
+                <form action="{% url 'newsletter_signup' %}" method="POST" class="newsletter-form">
+                    {% csrf_token %}
+                    <div class="input-group mb-3 border rounded-pill bg-white p-1">
+                        <input type="email" name="email" class="form-control border-0 px-4" placeholder="Email Address"
+                            required style="box-shadow: none; color: #000000 !important; background: white !important;">
+                        <button class="btn btn-ocean rounded-circle" type="submit"
+                            style="width: 45px; height: 45px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+
+        </div>
+        <hr class="border-secondary my-4 opacity-25">
+        <div class="text-center text-silver-gray align-items-center">
+            <small>&copy; {% now "Y" %} EventNest. All Rights Reserved.</small>
+        </div>
+    </div>
+</footer>
+
+<!-- Newsletter Success Modal -->
+<div class="modal fade" id="newsletterSuccessModal" tabindex="-1" aria-labelledby="newsletterSuccessModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden bg-white">
+            <div class="modal-body p-5 text-center">
+                <div class="mb-4">
+                    <div class="success-icon-wrapper mx-auto d-flex align-items-center justify-content-center"
+                        style="width: 100px; height: 100px; background: #FFF1F2; border-radius: 50%;">
+                        <i class="fas fa-check-circle text-ocean-blue display-1" style="color: #E11D48 !important;"></i>
+                    </div>
+                </div>
+                <h3 class="fw-bold mb-3" style="font-family: 'Playfair Display', serif;">Subscribed!</h3>
+                <p class="text-silver-gray mb-4" id="newsletterSuccessMessage">Thank you for subscribing to our
+                    newsletter!</p>
+                <button type="button" class="btn btn-ocean w-100 py-3 rounded-pill"
+                    data-bs-dismiss="modal">Great!</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .success-icon-wrapper {
+        animation: successScaleIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes successScaleIn {
+        from {
+            transform: scale(0);
+            opacity: 0;
+        }
+
+        to {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    #newsletterSuccessModal .modal-content {
+        backdrop-filter: blur(10px);
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        console.log("Newsletter script v2.1 loaded");
+        const newsletterForm = document.querySelector('.newsletter-form');
+
+        if (newsletterForm) {
+            newsletterForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+                const email = this.querySelector('input[name="email"]').value;
+                const csrfToken = this.querySelector('input[name="csrfmiddlewaretoken"]').value;
+
+                fetch(this.action, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({ email: email })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            // Update message text
+                            document.getElementById('newsletterSuccessMessage').textContent = data.message;
+
+                            // Initialize modal only when needed to ensure bootstrap is ready
+                            const newsletterModalEl = document.getElementById('newsletterSuccessModal');
+                            const newsletterModal = new bootstrap.Modal(newsletterModalEl);
+                            newsletterModal.show();
+
+                            newsletterForm.reset();
+                        } else {
+                            alert(data.message || 'An error occurred. Please try again.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Something went wrong. Please try again.');
+                    });
+            });
+        }
+    });
+</script>

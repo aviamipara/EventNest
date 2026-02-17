@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>New Login Detected</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #E11D48, #BE123C);
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #ffffff;
+            margin: 0;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .content {
+            padding: 40px 30px;
+            color: #333333;
+        }
+
+        .greeting {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #111827;
+        }
+
+        .alert-box {
+            background-color: #f0fdf4;
+            border-left: 4px solid #22c55e;
+            padding: 15px;
+            margin-bottom: 20px;
+            color: #15803d;
+        }
+
+        .details {
+            background-color: #f9fafb;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .details p {
+            margin: 5px 0;
+        }
+
+        .footer {
+            background-color: #f9fafb;
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #6b7280;
+            border-top: 1px solid #e5e7eb;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Security Alert</h1>
+        </div>
+        <div class="content">
+            <p class="greeting">Hi {{ user.first_name|default:'User' }},</p>
+
+            <div class="alert-box">
+                We noticed a new login to your EventNest account.
+            </div>
+
+            <div class="details">
+                <p><strong>Time:</strong> {{ time }}</p>
+                <p><strong>Date:</strong> {{ date }}</p>
+                <!-- Could add IP/Device if captured -->
+            </div>
+
+            <p style="color: #6b7280; font-size: 14px;">
+                If this was you, you can safely ignore this email. <br>
+                If you didn't log in, please <a href="#" style="color: #E11D48;">reset your password</a> immediately.
+            </p>
+        </div>
+        <div class="footer">
+            &copy; 2026 EventNest. Secure Account System.
+        </div>
+    </div>
+</body>
+
+</html>

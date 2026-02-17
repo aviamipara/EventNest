@@ -1,0 +1,144 @@
+/* Custom Event Wizard Styles */
+
+/* Wizard Container */
+.wizard-container {
+    background-color: var(--white);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    position: relative;
+    min-height: 600px;
+}
+
+/* Progress Bar */
+.wizard-progress {
+    background-color: var(--ice-blue);
+    height: 6px;
+    width: 100%;
+    position: relative;
+}
+
+.wizard-progress-bar {
+    background-color: var(--ocean-blue);
+    height: 100%;
+    width: 0%;
+    transition: width 0.4s ease;
+}
+
+/* Steps */
+.wizard-step {
+    display: none;
+    /* Hidden by default */
+    padding: 40px;
+    animation: fadeIn 0.5s ease;
+}
+
+.wizard-step.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Card Selection (Radio/Checkbox Replacement) */
+.selection-card {
+    border: 2px solid var(--ice-blue);
+    border-radius: 15px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    height: 100%;
+    background-color: var(--white);
+}
+
+.selection-card:hover {
+    border-color: var(--silver-gray);
+    transform: translateY(-5px);
+}
+
+.selection-card.selected {
+    border-color: var(--ocean-blue);
+    background-color: var(--ice-blue);
+    box-shadow: 0 5px 15px rgba(190, 18, 60, 0.2);
+}
+
+.selection-card i {
+    font-size: 2rem;
+    color: var(--ocean-blue);
+    margin-bottom: 15px;
+}
+
+.selection-card h5 {
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+    color: var(--navy);
+}
+
+/* Hidden Inputs for Selection Cards */
+.selection-input {
+    display: none;
+}
+
+/* Form Controls */
+.form-floating>.form-control:focus~label,
+.form-floating>.form-control:not(:placeholder-shown)~label {
+    color: var(--ocean-blue);
+}
+
+.form-control:focus {
+    border-color: var(--ocean-blue);
+    box-shadow: 0 0 0 0.25rem rgba(190, 18, 60, 0.25);
+}
+
+/* Navigation Buttons */
+.wizard-navigation {
+    padding: 20px 40px;
+    background-color: var(--ice-blue);
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Cost Summary Badge */
+.cost-badge {
+    background-color: var(--navy);
+    color: var(--white);
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-weight: bold;
+    font-size: 1.1rem;
+    box-shadow: 0 5px 15px rgba(2, 6, 23, 0.3);
+}
+
+/* Review Section */
+.review-item {
+    border-bottom: 1px solid var(--ice-blue);
+    padding: 10px 0;
+}
+
+.review-item:last-child {
+    border-bottom: none;
+}
+
+.review-label {
+    font-weight: 600;
+    color: var(--navy);
+}
+
+.review-value {
+    color: #64748b;
+}
+
+/* Toggle Switch Custom Color */
+.form-check-input:checked {
+    background-color: var(--ocean-blue);
+    border-color: var(--ocean-blue);
+}

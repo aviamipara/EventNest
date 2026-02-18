@@ -156,7 +156,8 @@ def student_events(request):
 
 def register_view(request):
     if request.method == 'POST':
-        name = request.POST.get('name')
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
         email = request.POST.get('email')
         password = request.POST.get('password')
         confirm_password = request.POST.get('confirm_password')
@@ -178,14 +179,14 @@ def register_view(request):
 
         # Strong Password Validation using AUTH_PASSWORD_VALIDATORS
         try:
-            validate_password(password, user=User(username=email, email=email, first_name=name))
+            validate_password(password, user=User(username=email, email=email, first_name=first_name, last_name=last_name))
         except DjangoValidationError as e:
             messages.error(request, ' '.join(e.messages))
             return redirect(request.path_info + '?mode=register')
 
         try:
             # Create Inactive User
-            user = User.objects.create_user(username=email, email=email, password=password, first_name=name)
+            user = User.objects.create_user(username=email, email=email, password=password, first_name=first_name, last_name=last_name)
             user.is_active = False # Deactivate until verified
             user.save()
 

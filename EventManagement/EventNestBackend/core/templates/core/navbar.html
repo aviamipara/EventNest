@@ -5,7 +5,8 @@
     <div class="container-fluid px-4 position-relative">
         <!-- Logo & Brand -->
         <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'index' %}">
-            <img src="{% static 'core/images/branding/logo.png' %}?v={% now 'U' %}" alt="EventNest" class="navbar-logo">
+            <img src="{% static 'core/images/branding/logo_round.png' %}?v={% now 'U' %}" alt="EventNest"
+                class="navbar-logo">
             <div>
                 <h4 class="mb-0 text-navy fw-bold nav-brand-text">
                     EventNest</h4>
@@ -23,12 +24,18 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <!-- Center: Nav Links -->
             <div class="navbar-nav navbar-nav-centered align-items-center">
-                <a class="nav-link nav-link-custom px-2 fw-bold" href="{% url 'index' %}">Home</a>
-                <a class="nav-link nav-link-custom px-2 fw-bold" href="{% url 'events' %}">Events</a>
-                <a class="nav-link nav-link-custom px-2 fw-bold" href="{% url 'student_events' %}">Student Zone</a>
-                <a class="nav-link nav-link-custom px-2 fw-bold" href="{% url 'index' %}#services">Services</a>
-                <a class="nav-link nav-link-custom px-2 fw-bold" href="{% url 'gallery' %}">Gallery</a>
-                <a class="nav-link nav-link-custom px-2 fw-bold" href="{% url 'index' %}#contact">Contact Us</a>
+                <a class="nav-link nav-link-custom px-2 fw-bold" href="{% url 'index' %}"><i
+                        class="fas fa-home me-1"></i> Home</a>
+                <a class="nav-link nav-link-custom px-2 fw-bold" href="{% url 'events' %}"><i
+                        class="fas fa-calendar-alt me-1"></i> Events</a>
+                <a class="nav-link nav-link-custom px-2 fw-bold" href="{% url 'student_events' %}"><i
+                        class="fas fa-user-graduate me-1"></i> Student Zone</a>
+                <a class="nav-link nav-link-custom px-2 fw-bold" href="{% url 'index' %}#services"><i
+                        class="fas fa-concierge-bell me-1"></i> Services</a>
+                <a class="nav-link nav-link-custom px-2 fw-bold" href="{% url 'gallery' %}"><i
+                        class="fas fa-images me-1"></i> Gallery</a>
+                <a class="nav-link nav-link-custom px-2 fw-bold" href="{% url 'index' %}#contact"><i
+                        class="fas fa-envelope me-1"></i> Contact Us</a>
             </div>
 
             <!-- Right: Action Buttons -->

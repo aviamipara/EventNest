@@ -699,9 +699,9 @@
                                 <label class="form-check-label" for="service3">Parking Pass</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="services[]" value="Merchandise"
-                                    id="service4" onchange="updateSummary()">
-                                <label class="form-check-label" for="service4">Merchandise</label>
+                                <input class="form-check-input" type="checkbox" name="services[]"
+                                    value="Professional Photography" id="service4" onchange="updateSummary()">
+                                <label class="form-check-label" for="service4">Professional Photography</label>
                             </div>
                         </div>
                     </div>
@@ -1062,7 +1062,7 @@
             if (val === 'Fast Track Entry') servicesCost += 300;
             if (val === 'Drink Package') servicesCost += 500;
             if (val === 'Parking Pass') servicesCost += 200;
-            if (val === 'Merchandise') servicesCost += 800;
+            if (val === 'Professional Photography') servicesCost += 2500;
         });
 
         const totalPrice = (guests * basePrice) + servicesCost;

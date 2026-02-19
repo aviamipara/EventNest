@@ -588,7 +588,7 @@ def events(request):
     # --- Context Data for Sidebar ---
     # 1. Categories
     db_categories = Event.objects.values_list('category', flat=True).distinct()
-    all_categories = sorted(list(set([c for c in db_categories if c])))
+    all_categories = sorted(list(set([c for c in db_categories if c and c.lower() != 'movies'])))
     
     # 2. Languages (Mock for now, or fetch if added to model)
     languages = ['English', 'Hindi', 'Marathi', 'Punjabi', 'Gujarati']
@@ -848,7 +848,12 @@ def custom_event(request):
 
                     notes=f"Time: {event_time}\nDetails: {message}"
                 )
-                return render(request, 'core/custom_event.html', {'success': True})
+                return render(request, 'core/custom_event.html', {
+                    'success': True,
+                    'submitted_name': name,
+                    'submitted_email': email,
+                    'submitted_type': event_type
+                })
             except Exception as e:
                 print(f"Error creating custom event: {e}")
                 return render(request, 'core/custom_event.html', {'error': str(e)})

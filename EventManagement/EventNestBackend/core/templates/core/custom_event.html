@@ -760,17 +760,16 @@
             </div>
             <div class="modal-body text-center p-5">
                 <p class="text-muted mb-4" style="font-size: 1.1rem;">
-                    Thank you, <span class="fw-bold text-navy">{{ request.POST.name|default:'there' }}</span>!
+                    Thank you, <span class="fw-bold text-navy">{{ submitted_name|default:'there' }}</span>!
                     We've received your plan.
                 </p>
                 <div class="p-3 bg-light rounded-3 mb-4 text-start border">
                     <div class="d-flex justify-content-between mb-2">
                         <span class="text-muted">Type:</span>
-                        <span class="fw-bold text-navy">{{ request.POST.event_type|title }} Event</span>
+                        <span class="fw-bold text-navy">{{ submitted_type|title }} Event</span>
                     </div>
                 </div>
-                <p class="small text-muted mb-4">Our event coordinator will contact you shortly at <br><strong>{{
-                        request.POST.email }}</strong></p>
+                <p class="small text-muted mb-4">Our event coordinator will contact you shortly at <br><strong>{{ submitted_email }}</strong></p>
                 <button type="button" class="btn btn-navy w-100 py-3 rounded-pill fw-bold" data-bs-dismiss="modal"
                     style="background: #0A1628; color: white;">
                     Awesome, thanks!

@@ -135,8 +135,22 @@ def contact_submit(request):
 
 def student_events(request):
     # Fetch events with category 'student' (case-insensitive)
-    events_list = Event.objects.filter(category__iexact='student').order_by('date')
+    search_query = request.GET.get('q', '').strip()
     
+    if search_query:
+        # Search ALL 'student' events (including past, all pages)
+        # We assume 'Student' is the category name. Adjust if it uses multiple categories.
+        events_list = Event.objects.filter(category__iexact='student').order_by('date')
+        from django.db.models import Q
+        events_list = events_list.filter(
+             Q(title__icontains=search_query) | 
+             Q(description__icontains=search_query)
+             # Removed category search since we are restricted to student
+        )
+    else:
+        # Default: Only 'student' category
+        events_list = Event.objects.filter(category__iexact='student').order_by('date')
+
     # --- Pagination ---
     from django.core.paginator import Paginator
     paginator = Paginator(events_list, 12) # Pagination increased to 12 to fill grid
@@ -522,17 +536,20 @@ def logout_view(request):
 
 def events(request):
     # Fetch all future events from DB
-    events_list = Event.objects.filter(date__gte=timezone.now())
-    
-    # --- SEARCH ---
-    search_query = request.GET.get('q')
+    search_query = request.GET.get('q', '').strip()
+
     if search_query:
+        # User Request: Search ALL events (including past) when searching
+        events_list = Event.objects.all().order_by('date')
         from django.db.models import Q
         events_list = events_list.filter(
             Q(title__icontains=search_query) | 
             Q(description__icontains=search_query) | 
             Q(category__icontains=search_query)
         )
+    else:
+        # Default: Future events only
+        events_list = Event.objects.filter(date__gte=timezone.now())
 
     # --- FILTERS ---
 
@@ -1046,5 +1063,35 @@ def profile_view(request):
         return redirect('profile')
         
     return render(request, 'core/profile.html', {'user': request.user, 'profile': profile})
+
+@require_http_methods(["GET"])
+def search_suggestions(request):
+    """
+    API endpoint to return a list of suggestions matching the search query 'q'.
+    Returns event titles and categories.
+    """
+    search_query = request.GET.get('q', '').strip()
+    suggestions = []
+    
+    if search_query:
+        # 1. Match Titles (Startswith first for higher relevance)
+        title_matches_start = list(Event.objects.filter(title__istartswith=search_query).values_list('title', flat=True).distinct()[:5])
+        
+        # 2. Match Titles (Contains)
+        title_matches_contains = list(Event.objects.filter(title__icontains=search_query).exclude(title__in=title_matches_start).values_list('title', flat=True).distinct()[:5])
+        
+        suggestions.extend(title_matches_start)
+        suggestions.extend(title_matches_contains)
+        
+        # Limit total title suggestions
+        suggestions = suggestions[:5]
+
+        # 3. Match Categories
+        category_matches = list(Event.objects.filter(category__icontains=search_query).values_list('category', flat=True).distinct()[:3])
+        for cat in category_matches:
+            if f"Category: {cat}" not in suggestions:
+                suggestions.append(f"Category: {cat}")
+            
+    return JsonResponse({'suggestions': suggestions})
 
 

@@ -2,7 +2,62 @@ document.addEventListener('DOMContentLoaded', () => {
     const tabsContainer = document.getElementById('category-tabs');
     const eventsContainer = document.getElementById('events-container');
     const searchInput = document.getElementById('eventSearch');
+    const suggestionsContainer = document.getElementById('searchSuggestions');
     const sortSelect = document.getElementById('sortEvents');
+    let debounceTimer;
+
+    // --- Search Suggestions ---
+    if (searchInput && suggestionsContainer) {
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.trim();
+            if (debounceTimer) clearTimeout(debounceTimer);
+
+            if (query.length < 2) {
+                suggestionsContainer.style.display = 'none';
+                return;
+            }
+
+            debounceTimer = setTimeout(() => {
+                fetch(`/api/search-suggestions/?q=${encodeURIComponent(query)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        suggestionsContainer.innerHTML = '';
+                        if (data.suggestions && data.suggestions.length > 0) {
+                            suggestionsContainer.style.display = 'block';
+                            data.suggestions.forEach(suggestion => {
+                                const div = document.createElement('div');
+                                div.className = 'search-suggestion-item';
+
+                                // Check if it's a category or simple title
+                                if (suggestion.startsWith('Category: ')) {
+                                    div.innerHTML = `<span style="font-weight:bold; color:#E11D48;">Category:</span> ${suggestion.replace('Category: ', '')}`;
+                                } else {
+                                    div.innerHTML = `<i class="fas fa-calendar-alt" style="margin-right:8px; color:#9CA3AF;"></i> ${suggestion}`;
+                                }
+
+                                div.addEventListener('click', () => {
+                                    // Remove "Category: " prefix if clicked
+                                    searchInput.value = suggestion.replace('Category: ', '');
+                                    suggestionsContainer.style.display = 'none';
+                                    searchInput.closest('form').submit();
+                                });
+                                suggestionsContainer.appendChild(div);
+                            });
+                        } else {
+                            suggestionsContainer.style.display = 'none';
+                        }
+                    })
+                    .catch(err => console.error('Search error:', err));
+            }, 300);
+        });
+
+        // Hide suggestions when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!searchInput.contains(e.target) && !suggestionsContainer.contains(e.target)) {
+                suggestionsContainer.style.display = 'none';
+            }
+        });
+    }
 
     // Handle Sort Change
     if (sortSelect) {
@@ -33,71 +88,6 @@ document.addEventListener('DOMContentLoaded', () => {
             window.location.href = currentUrl.toString();
         });
     });
-
-    // Client-side Search (Keep existing client-side text filter for speed on current page)
-    if (searchInput) {
-        const clearBtn = document.getElementById('clearSearch');
-
-        searchInput.addEventListener('input', (e) => {
-            const query = e.target.value.toLowerCase();
-            const allCards = document.querySelectorAll('.event-card');
-            let visibleCount = 0;
-
-            // Show/Hide Clear Button
-            if (clearBtn) {
-                if (query.length > 0) {
-                    clearBtn.classList.remove('d-none');
-                } else {
-                    clearBtn.classList.add('d-none');
-                }
-            }
-
-            allCards.forEach(card => {
-                const cardName = card.getAttribute('data-name');
-                if (cardName.includes(query)) {
-                    card.style.display = '';
-                    visibleCount++;
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-
-            // Toggle No Results
-            let noResultsMsg = document.getElementById('no-results-msg');
-            if (visibleCount === 0) {
-                if (!noResultsMsg) {
-                    noResultsMsg = document.createElement('div');
-                    noResultsMsg.id = 'no-results-msg';
-                    noResultsMsg.className = 'col-12 text-center py-5';
-                    noResultsMsg.innerHTML = '<p class="text-muted fs-5">No events matching your search.</p>';
-                    eventsContainer.appendChild(noResultsMsg);
-                }
-                noResultsMsg.style.display = 'block';
-            } else {
-                if (noResultsMsg) noResultsMsg.style.display = 'none';
-            }
-        });
-
-        if (clearBtn) {
-            clearBtn.addEventListener('click', () => {
-                searchInput.value = '';
-
-                // If we are on the main events page (server-side search), we should reload to clear the URL query
-                const urlParams = new URLSearchParams(window.location.search);
-                if (urlParams.has('q')) {
-                    urlParams.delete('q');
-                    window.location.search = urlParams.toString();
-                } else {
-                    // Otherwise just trigger the input event for client-side filtering (Student Zone)
-                    searchInput.dispatchEvent(new Event('input'));
-                    searchInput.focus();
-                }
-            });
-        }
-    }
-
-    // Server-side filtering is now primary.
-    // Client-side search (above) is kept for instant feedback on the current page.
 });
 
 // Helper for the "Book Now" buttons to pre-fill the modal

@@ -56,5 +56,8 @@ urlpatterns = [
     # Contact
     path('contact-submit/', views.contact_submit, name='contact_submit'),
     path('newsletter-signup/', views.newsletter_signup, name='newsletter_signup'),
+
+    # Search Suggestions API
+    path('api/search-suggestions/', views.search_suggestions, name='search_suggestions'),
 ]
 

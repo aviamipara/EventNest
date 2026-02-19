@@ -7,7 +7,7 @@
 {% block main_class %}{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'core/css/events.css' %}?v=10">
+<link rel="stylesheet" href="{% static 'core/css/events.css' %}?v=40">
 <style>
     /* Student-like Page Specific Overrides for Events */
 
@@ -71,10 +71,15 @@
         <form class="search-container" method="GET" action="{% url 'events' %}">
             <input type="text" name="q" id="eventSearch" placeholder="Search Events"
                 value="{{request.GET.q|default:'' }}">
-            <i class="fas fa-search search-icon"></i>
-            <button type="button" id="clearSearch" class="btn-clear-search {% if not request.GET.q %}d-none{% endif %}">
-                <i class="fas fa-times"></i>
+            <button type="submit" class="search-submit-btn">
+                <i class="fas fa-search"></i>
             </button>
+            {% if request.GET.q %}
+            <a href="{% url 'events' %}" id="clearSearch" class="btn-clear-search">
+                <i class="fas fa-times"></i>
+            </a>
+            {% endif %}
+            <div id="searchSuggestions" class="search-suggestions-container"></div>
         </form>
     </div>
 </div>
@@ -245,6 +250,6 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'core/js/events.js' %}"></script>
+<script src="{% static 'core/js/events.js' %}?v=40"></script>
 
 {% endblock %}

@@ -413,23 +413,77 @@
 
     /* Mobile */
     @media (max-width: 992px) {
+        .booking-container {
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+
         .booking-wrapper {
             flex-direction: column;
+            min-height: auto;
+        }
+
+        .booking-form-section {
+            padding: 30px 20px;
+            flex: 1;
         }
 
         .booking-summary-section {
-            padding: 40px;
-            order: 0;
+            padding: 30px 20px;
+            order: 2;
+            /* Move summary to bottom on mobile */
             min-height: auto;
         }
 
         .summary-card-3d {
             transform: none !important;
             /* Disable 3D on mobile */
+            margin-top: 20px;
         }
 
         .ticket-container {
             height: auto;
+        }
+
+        .event-type-grid {
+            grid-template-columns: repeat(2, 1fr);
+            /* 2 columns on mobile */
+        }
+
+        .btn-next {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .booking-steps {
+            gap: 15px;
+            margin-bottom: 30px;
+            justify-content: space-between;
+        }
+
+        .step-text {
+            display: none;
+            /* Hide step text on small screens to save space */
+        }
+
+        .step-item.active .step-text {
+            display: block;
+            /* Show only active step text */
+            font-size: 0.85rem;
+        }
+
+        .summary-title {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .booking-steps {
+            justify-content: center;
+        }
+
+        .btn-prev {
+            padding: 10px 20px;
         }
     }
 
@@ -698,11 +752,7 @@
                                     id="service3" onchange="updateSummary()">
                                 <label class="form-check-label" for="service3">Parking Pass</label>
                             </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="services[]"
-                                    value="Professional Photography" id="service4" onchange="updateSummary()">
-                                <label class="form-check-label" for="service4">Professional Photography</label>
-                            </div>
+
                         </div>
                     </div>
 
@@ -1062,7 +1112,7 @@
             if (val === 'Fast Track Entry') servicesCost += 300;
             if (val === 'Drink Package') servicesCost += 500;
             if (val === 'Parking Pass') servicesCost += 200;
-            if (val === 'Professional Photography') servicesCost += 2500;
+
         });
 
         const totalPrice = (guests * basePrice) + servicesCost;

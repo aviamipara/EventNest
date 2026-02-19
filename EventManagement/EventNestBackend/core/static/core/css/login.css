@@ -458,18 +458,136 @@ input {
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 992px) {
+    body {
+        height: auto;
+        min-height: 100vh;
+        overflow-y: auto;
+        padding-bottom: 20px;
+    }
+
+    .auth-container {
+        height: auto;
+        min-height: 100vh;
+        /* Allow full height */
+        padding: 100px 20px 40px 20px;
+        /* Increased top padding to clear logo */
+        max-width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        /* Start from top instead of center */
+    }
+
+    .glass-card {
+        height: auto;
+        min-height: auto;
+        overflow: visible;
+        display: flex;
+        flex-direction: column;
+        border-radius: 20px;
+        /* Ensure rounded corners */
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        /* Enhance mobile shadow */
+    }
+
+    /* Hide the desktop overlay slider completely */
+    .overlay-container {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+    }
+
+    /* Reset form wrappers to stack naturally */
+    .forms-wrapper {
+        position: relative !important;
+        width: 100% !important;
+        height: auto !important;
+        top: auto !important;
+        left: auto !important;
+        opacity: 1 !important;
+        transform: none !important;
+        transition: none !important;
+    }
+
+    /* Logic to show/hide forms based on state */
+    /* Default: Show Sign In, Hide Sign Up */
+    .sign-in-container {
+        display: block !important;
+        z-index: 5;
+    }
+
+    .sign-up-container {
+        display: none !important;
+    }
+
+    /* Active State: Hide Sign In, Show Sign Up */
+    .glass-card.right-panel-active .sign-in-container {
+        display: none !important;
+    }
+
+    .glass-card.right-panel-active .sign-up-container {
+        display: block !important;
+        animation: fadeIn 0.4s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Form styling adjustment */
+    form {
+        padding: 30px 20px;
+        height: auto;
+        min-height: auto;
+        background: transparent;
+        /* Remove white bg if glass card has it */
+    }
+
+    /* Mobile Toggle Text */
+    .mobile-toggle-text {
+        display: block !important;
+        color: #64748b;
+        font-size: 0.95rem;
+        margin-top: 1.5rem;
+    }
+
+    .mobile-toggle-text a {
+        color: var(--ocean-blue);
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    /* Adjust logo */
     .logo-floating {
-        top: 20px;
-        left: 20px;
+        top: 30px;
+        /* Moved down slightly */
+        left: 0;
+        transform: none;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 
     .logo-img {
-        width: 36px;
-        height: 36px;
+        width: 45px;
+        /* Larger logo */
+        height: 45px;
     }
 
     .logo-text {
-        font-size: 20px;
+        font-size: 24px;
+        /* Larger text */
+        color: white;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     }
 }

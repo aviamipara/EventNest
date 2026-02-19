@@ -16,7 +16,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{% static 'core/css/style.css' %}?v=5.0">
-    <link rel="stylesheet" href="{% static 'core/css/login.css' %}?v=14">
+    <link rel="stylesheet" href="{% static 'core/css/login.css' %}?v=18">
     <style>
         /* INLINE STYLES TO FORCE UPDATE */
         body,
@@ -311,6 +311,8 @@
                     </div>
                     <button type="submit" class="btn-ocean" style="color: #ffffff !important;">Sign Up</button>
                     <a href="{% url 'index' %}" style="margin-top: 15px; font-size: 0.8rem;">Back to Home</a>
+                    <p class="mobile-toggle-text mt-3" style="display: none;">Already have an account? <a href="#"
+                            id="mobileSignIn">Sign In</a></p>
                 </form>
             </div>
 
@@ -346,6 +348,8 @@
                         password?</a>
                     <button type="submit" class="btn-ocean" style="color: #ffffff !important;">Sign In</button>
                     <a href="{% url 'index' %}" style="margin-top: 15px; font-size: 0.8rem;">Back to Home</a>
+                    <p class="mobile-toggle-text mt-3" style="display: none;">Don't have an account? <a href="#"
+                            id="mobileSignUp">Sign Up</a></p>
                 </form>
             </div>
 
@@ -377,15 +381,32 @@
         const signUpButton = document.getElementById('signUp');
         const signInButton = document.getElementById('signIn');
         const container = document.getElementById('container');
+        const mobileSignUp = document.getElementById('mobileSignUp');
+        const mobileSignIn = document.getElementById('mobileSignIn');
 
-        if (signUpButton && signInButton && container) {
-            signUpButton.addEventListener('click', () => {
-                container.classList.add("right-panel-active");
-            });
-
-            signInButton.addEventListener('click', () => {
-                container.classList.remove("right-panel-active");
-            });
+        if (container) {
+            if (signUpButton) {
+                signUpButton.addEventListener('click', () => {
+                    container.classList.add("right-panel-active");
+                });
+            }
+            if (signInButton) {
+                signInButton.addEventListener('click', () => {
+                    container.classList.remove("right-panel-active");
+                });
+            }
+            if (mobileSignUp) {
+                mobileSignUp.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    container.classList.add("right-panel-active");
+                });
+            }
+            if (mobileSignIn) {
+                mobileSignIn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    container.classList.remove("right-panel-active");
+                });
+            }
         }
 
         // Force clear inputs on load and pageshow

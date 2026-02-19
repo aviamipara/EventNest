@@ -371,26 +371,80 @@
 
     /* Mobile Responsive */
     @media (max-width: 992px) {
+        .booking-container {
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+
         .booking-wrapper {
             flex-direction: column;
+            min-height: auto;
+        }
+
+        .booking-form-section {
+            padding: 30px 20px;
+            order: 1;
+            /* Form first */
         }
 
         .booking-summary-section {
-            padding: 30px;
-            order: -1;
-            /* Show summary on top or keep default? Let's keep form first on mobile usually, but maybe summary is catchy.*/
-            /* Let's keep form first for functionality */
-            order: 0;
+            padding: 40px 25px;
+            order: 2;
+            /* Summary second (bottom) */
+            min-height: auto;
+            text-align: center;
+        }
+
+        .summary-title {
+            font-size: 2.2rem;
+        }
+
+        .feature-list {
+            margin-top: 30px;
+            text-align: left;
         }
 
         .event-type-grid {
             grid-template-columns: repeat(2, 1fr);
+            /* 2 columns */
+            gap: 10px;
         }
-    }
 
-    @media (max-width: 576px) {
-        .booking-form-section {
-            padding: 30px 20px;
+        .booking-steps {
+            gap: 15px;
+            margin-bottom: 30px;
+            justify-content: center;
+            /* Center the steps */
+            flex-wrap: wrap;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .step-text {
+            display: none;
+            /* Hide text to save space */
+        }
+
+        .step-item.active .step-text {
+            display: block;
+            /* Show active text only */
+            font-size: 0.85rem;
+        }
+
+        .btn-next,
+        .btn-prev {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .form-navigation {
+            flex-direction: column-reverse;
+            /* Stack buttons */
+            gap: 15px;
         }
     }
 
@@ -769,7 +823,8 @@
                         <span class="fw-bold text-navy">{{ submitted_type|title }} Event</span>
                     </div>
                 </div>
-                <p class="small text-muted mb-4">Our event coordinator will contact you shortly at <br><strong>{{ submitted_email }}</strong></p>
+                <p class="small text-muted mb-4">Our event coordinator will contact you shortly at <br><strong>{{
+                        submitted_email }}</strong></p>
                 <button type="button" class="btn btn-navy w-100 py-3 rounded-pill fw-bold" data-bs-dismiss="modal"
                     style="background: #0A1628; color: white;">
                     Awesome, thanks!

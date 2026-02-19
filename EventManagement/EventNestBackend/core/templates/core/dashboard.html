@@ -25,8 +25,9 @@
                 <div class="card shadow-sm border-0">
                     <div class="card-body">
                         <h5 class="card-title mb-3">Recent Bookings</h5>
-                        <div class="table-responsive">
-                            <table class="table table-hover">
+                        <!-- Desktop Table View -->
+                        <div class="table-responsive d-none d-md-block">
+                            <table class="table table-hover align-middle">
                                 <thead class="table-light">
                                     <tr>
                                         <th>Date</th>
@@ -35,44 +36,43 @@
                                         <th>Guests</th>
                                         <th>Budget</th>
                                         <th>Status</th>
-                                        <th>Ticket</th>
+                                        <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {% for booking in bookings %}
                                     <tr>
-                                        <td>{{booking.created_at|date:"M d, Y" }}</td>
+                                        <td>{{ booking.created_at|date:"M d, Y" }}</td>
                                         <td>
-                                            <div class="fw-bold">{{booking.name }}</div>
-                                            <small class="text-muted">{{booking.email }}</small>
+                                            <div class="fw-bold text-dark">{{ booking.name }}</div>
+                                            <small class="text-muted">{{ booking.email }}</small>
                                         </td>
                                         <td>
                                             {% if booking.event %}
-                                            <div class="fw-bold text-primary">{{booking.event.title }}</div>
-                                            <small class="text-muted">{{booking.event_type|title }}</small>
+                                            <div class="fw-bold text-primary">{{ booking.event.title }}</div>
                                             {% elif booking.event_name %}
-                                            <div class="fw-bold text-primary">{{booking.event_name }}</div>
-                                            <small class="text-muted">{{booking.event_type|title }}</small>
+                                            <div class="fw-bold text-primary">{{ booking.event_name }}</div>
                                             {% else %}
-                                            {{booking.event_type|title }}
+                                            <span class="text-muted">General Booking</span>
                                             {% endif %}
+                                            <small class="text-muted d-block">{{ booking.event_type|default:"-" }}</small>
                                         </td>
-                                        <td>{{booking.guest_count }}</td>
-                                        <td>{{booking.budget|title }}</td>
+                                        <td>{{ booking.guest_count }}</td>
+                                        <td>{{ booking.budget|default:"-" }}</td>
                                         <td>
                                             {% if booking.status == 'Confirmed' %}
-                                            <span class="badge bg-success">Confirmed</span>
+                                            <span class="badge bg-success rounded-pill px-3">Confirmed</span>
                                             {% elif booking.status == 'Rejected' %}
-                                            <span class="badge bg-danger">Rejected</span>
+                                            <span class="badge bg-danger rounded-pill px-3">Rejected</span>
                                             {% else %}
-                                            <span class="badge bg-warning text-dark">Pending</span>
+                                            <span class="badge bg-warning text-dark rounded-pill px-3">Pending</span>
                                             {% endif %}
                                         </td>
                                         <td>
                                             {% if booking.status == 'Confirmed' %}
                                             <a href="{% url 'view_ticket' 'booking' booking.id %}"
                                                 class="btn btn-sm btn-outline-ocean rounded-pill">
-                                                <i class="fas fa-ticket-alt"></i> View
+                                                <i class="fas fa-ticket-alt me-1"></i> Ticket
                                             </a>
                                             {% else %}
                                             <span class="text-muted small">-</span>
@@ -81,11 +81,77 @@
                                     </tr>
                                     {% empty %}
                                     <tr>
-                                        <td colspan="6" class="text-center text-muted py-4">No bookings found.</td>
+                                        <td colspan="7" class="text-center text-muted py-5">
+                                            <i class="fas fa-inbox fa-2x mb-3 text-light"></i><br>
+                                            No bookings found.
+                                        </td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>
                             </table>
+                        </div>
+
+                        <!-- Mobile Card View -->
+                        <div class="d-md-none">
+                            {% for booking in bookings %}
+                            <div class="card mb-3 border shadow-sm rounded-4">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <div>
+                                            <h6 class="fw-bold text-navy mb-1">
+                                                {% if booking.event %}
+                                                {{ booking.event.title }}
+                                                {% elif booking.event_name %}
+                                                {{ booking.event_name }}
+                                                {% else %}
+                                                General Booking
+                                                {% endif %}
+                                            </h6>
+                                            <span class="badge bg-light text-dark border">{{ booking.event_type }}</span>
+                                        </div>
+                                        <div class="text-end">
+                                            {% if booking.status == 'Confirmed' %}
+                                            <span class="badge bg-success rounded-pill">Confirmed</span>
+                                            {% elif booking.status == 'Rejected' %}
+                                            <span class="badge bg-danger rounded-pill">Rejected</span>
+                                            {% else %}
+                                            <span class="badge bg-warning text-dark rounded-pill">Pending</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <small class="text-muted d-block mb-1">
+                                            <i class="far fa-calendar me-2"></i>{{ booking.created_at|date:"M d, Y" }}
+                                        </small>
+                                        <small class="text-muted d-block mb-1">
+                                            <i class="far fa-user me-2"></i>{{ booking.name }}
+                                        </small>
+                                        <div class="d-flex gap-3 mt-2 text-sm">
+                                            <small><i class="fas fa-users me-1"></i> {{ booking.guest_count }}
+                                                Guests</small>
+                                            {% if booking.budget %}
+                                            <small><i class="fas fa-wallet me-1"></i> {{ booking.budget }}</small>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                                    {% if booking.status == 'Confirmed' %}
+                                    <div class="d-grid">
+                                        <a href="{% url 'view_ticket' 'booking' booking.id %}"
+                                            class="btn btn-outline-ocean btn-sm rounded-pill">
+                                            <i class="fas fa-ticket-alt me-1"></i> View Ticket
+                                        </a>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="text-center text-muted py-5">
+                                <i class="fas fa-inbox fa-3x mb-3 text-light"></i>
+                                <p>No bookings found.</p>
+                            </div>
+                            {% endfor %}
                         </div>
                     </div>
                 </div>
@@ -95,57 +161,116 @@
             <div class="tab-pane fade" id="custom" role="tabpanel">
                 <div class="card shadow-sm border-0">
                     <div class="card-body">
-                        <h5 class="card-title mb-3">Custom Event Designs</h5>
-                        <div class="table-responsive">
-                            <table class="table table-hover">
+                        <h5 class="card-title mb-3 d-none d-md-block">Custom Event Designs</h5>
+
+                        <!-- Desktop Table View -->
+                        <div class="table-responsive d-none d-md-block">
+                            <table class="table table-hover align-middle">
                                 <thead class="table-light">
                                     <tr>
                                         <th>Created</th>
-                                        <th>Event Name</th>
+                                        <th>Name</th>
                                         <th>Type</th>
                                         <th>Date</th>
                                         <th>Est. Cost</th>
                                         <th>Status</th>
-                                        <th>Ticket</th>
                                         <th>Location</th>
+                                        <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {% for event in custom_events %}
                                     <tr>
-                                        <td>{{event.created_at|date:"M d, Y" }}</td>
-                                        <td>{{event.event_name }}</td>
-                                        <td>{{event.event_type|title }}</td>
-                                        <td>{{event.event_date }}</td>
-                                        <td class="fw-bold text-success">{{event.total_cost }}</td>
+                                        <td>{{ event.created_at|date:"M d, Y" }}</td>
+                                        <td class="fw-bold text-navy">{{ event.event_name }}</td>
+                                        <td><span class="badge bg-light text-dark border">{{ event.event_type }}</span>
+                                        </td>
+                                        <td>{{ event.event_date }}</td>
+                                        <td class="fw-bold text-success">{{ event.total_cost|default:"-" }}</td>
                                         <td>
                                             {% if event.status == 'Confirmed' %}
-                                            <span class="badge bg-success">Confirmed</span>
+                                            <span class="badge bg-success rounded-pill px-3">Confirmed</span>
                                             {% elif event.status == 'Rejected' %}
-                                            <span class="badge bg-danger">Rejected</span>
+                                            <span class="badge bg-danger rounded-pill px-3">Rejected</span>
                                             {% else %}
-                                            <span class="badge bg-warning text-dark">Pending</span>
+                                            <span class="badge bg-warning text-dark rounded-pill px-3">Pending</span>
                                             {% endif %}
                                         </td>
+                                        <td><small class="text-muted"><i class="fas fa-map-marker-alt me-1"></i> {{ event.location }}</small></td>
                                         <td>
                                             {% if event.status == 'Confirmed' %}
                                             <a href="{% url 'view_ticket' 'custom' event.id %}"
                                                 class="btn btn-sm btn-outline-ocean rounded-pill">
-                                                <i class="fas fa-ticket-alt"></i> View
+                                                <i class="fas fa-ticket-alt me-1"></i> Ticket
                                             </a>
                                             {% else %}
                                             <span class="text-muted small">-</span>
                                             {% endif %}
                                         </td>
-                                        <td>{{event.location }}</td>
                                     </tr>
                                     {% empty %}
                                     <tr>
-                                        <td colspan="6" class="text-center text-muted py-4">No custom events found.</td>
+                                        <td colspan="8" class="text-center text-muted py-5">
+                                            <i class="fas fa-magic fa-2x mb-3 text-light"></i><br>
+                                            No custom events found.
+                                        </td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>
                             </table>
+                        </div>
+
+                        <!-- Mobile Card View -->
+                        <div class="d-md-none">
+                            {% for event in custom_events %}
+                            <div class="card mb-3 border shadow-sm rounded-4">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <div>
+                                            <h6 class="fw-bold text-navy mb-1">{{ event.event_name }}</h6>
+                                            <span class="badge bg-light text-dark border">{{ event.event_type }}</span>
+                                        </div>
+                                        <div class="text-end">
+                                            {% if event.status == 'Confirmed' %}
+                                            <span class="badge bg-success rounded-pill">Confirmed</span>
+                                            {% elif event.status == 'Rejected' %}
+                                            <span class="badge bg-danger rounded-pill">Rejected</span>
+                                            {% else %}
+                                            <span class="badge bg-warning text-dark rounded-pill">Pending</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <small class="text-muted d-block mb-1">
+                                            <i class="far fa-calendar-alt me-2"></i>{{ event.event_date }}
+                                        </small>
+                                        <small class="text-muted d-block mb-1">
+                                            <i class="fas fa-map-marker-alt me-2"></i>{{ event.location }}
+                                        </small>
+                                        {% if event.total_cost %}
+                                        <div class="mt-2 text-success fw-bold">
+                                            <i class="fas fa-tag me-1"></i> {{ event.total_cost }}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+
+                                    {% if event.status == 'Confirmed' %}
+                                    <div class="d-grid">
+                                        <a href="{% url 'view_ticket' 'custom' event.id %}"
+                                            class="btn btn-outline-ocean btn-sm rounded-pill">
+                                            <i class="fas fa-ticket-alt me-1"></i> View Ticket
+                                        </a>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="text-center text-muted py-5">
+                                <i class="fas fa-magic fa-3x mb-3 text-light"></i>
+                                <p>No custom events found.</p>
+                            </div>
+                            {% endfor %}
                         </div>
                     </div>
                 </div>

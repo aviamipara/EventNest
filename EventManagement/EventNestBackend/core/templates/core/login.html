@@ -223,7 +223,7 @@
 
     <!-- Floating Logo -->
     <a href="{% url 'index' %}" class="logo-floating">
-        <img src="{% static 'core/images/branding/logo.png' %}" alt="EventNest Logo" class="logo-img">
+        <img src="{% static 'core/images/branding/logo.png' %}?v={% now 'U' %}" alt="EventNest Logo" class="logo-img">
         <div class="logo-text">EventNest</div>
     </a>
 

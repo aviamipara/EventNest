@@ -44,6 +44,7 @@ urlpatterns = [
     
     # Management
     path('dashboard/', views.dashboard, name='dashboard'),
+    path('ticket/<str:ticket_type>/<int:ticket_id>/', views.view_ticket, name='view_ticket'),
     
 
 

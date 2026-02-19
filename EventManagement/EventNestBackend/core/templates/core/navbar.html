@@ -5,7 +5,7 @@
     <div class="container-fluid px-4 position-relative">
         <!-- Logo & Brand -->
         <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'index' %}">
-            <img src="{% static 'core/images/branding/logo.png' %}" alt="EventNest" class="navbar-logo">
+            <img src="{% static 'core/images/branding/logo.png' %}?v={% now 'U' %}" alt="EventNest" class="navbar-logo">
             <div>
                 <h4 class="mb-0 text-navy fw-bold nav-brand-text">
                     EventNest</h4>
@@ -39,7 +39,7 @@
                 {% if user.is_authenticated %}
                 <div class="dropdown">
                     <button class="btn btn-ocean dropdown-toggle text-nowrap" type="button" data-bs-toggle="dropdown">
-                        Hi, {{ user.first_name|default:user.username }}
+                        Hi, {{ user.first_name|truncatewords:1|cut:" ..."|default:user.username }}
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end bg-white border-light shadow-sm">
                         <li><a class="dropdown-item text-navy" href="{% url 'dashboard' %}">Dashboard</a></li>

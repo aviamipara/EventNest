@@ -875,6 +875,71 @@ def custom_event_api(request):
         return Response({'status': 'error', 'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 @login_required
+def view_ticket(request, ticket_type, ticket_id):
+    email = request.user.email
+    ticket_data = {}
+    
+    if ticket_type == 'booking':
+        try:
+            booking = Booking.objects.get(id=ticket_id, email=email)
+            if booking.status != 'Confirmed':
+                messages.error(request, "Ticket not available. Booking is not confirmed.")
+                return redirect('dashboard')
+            
+            # Use linked event image if available, otherwise default
+            event_img = ""
+            if booking.event and booking.event.get_image_url:
+                event_img = booking.event.get_image_url
+            
+            ticket_data = {
+                'ticket_id': f"B-{booking.id}",
+                'event_name': booking.event.title if booking.event else booking.event_name,
+                'event_date': booking.event_date,
+                'location': booking.venue_preference or "To be decided",
+                'event_type': booking.event_type,
+                'user_name': booking.name,
+                'guest_count': booking.guest_count,
+                'services': booking.services,
+            }
+        except Booking.DoesNotExist:
+            messages.error(request, "Ticket not found.")
+            return redirect('dashboard')
+            
+    elif ticket_type == 'custom':
+        try:
+            event = CustomEvent.objects.get(id=ticket_id, email=email)
+            if event.status != 'Confirmed':
+                messages.error(request, "Ticket not available. Event is not confirmed.")
+                return redirect('dashboard')
+            
+            # Construct Services List
+            services_list = []
+            if event.stage_decor: services_list.append("Stage Decor")
+            if event.flower_decor: services_list.append("Flower Decor")
+            if event.lighting_style: services_list.append("Lighting")
+            if event.photography and event.photography.lower() not in ['no', 'none', '']: services_list.append(f"Photography ({event.photography})")
+            if event.videography and event.videography.lower() not in ['no', 'none', '']: services_list.append(f"Videography ({event.videography})")
+            if event.drone_shoot and event.drone_shoot.lower() not in ['no', 'none', '']: services_list.append("Drone Shoot")
+            if event.food_type: services_list.append(f"Catering ({event.food_type})")
+            if event.security: services_list.append("Security")
+            
+            ticket_data = {
+                'ticket_id': f"C-{event.id}",
+                'event_name': event.event_name,
+                'event_date': event.event_date,
+                'location': event.location,
+                'event_type': event.event_type,
+                'user_name': request.user.get_full_name() or email,
+                'guest_count': event.guests,
+                'services': ", ".join(services_list) if services_list else "Standard Package",
+            }
+        except CustomEvent.DoesNotExist:
+             messages.error(request, "Ticket not found.")
+             return redirect('dashboard')
+    
+    return render(request, 'core/ticket.html', ticket_data)
+
+@login_required
 def dashboard(request):
     # Retrieve bookings and custom events for the logged-in user only
     email = request.user.email

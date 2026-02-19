@@ -49,3 +49,32 @@ def set_otp_for_user(user, duration_minutes=10):
     user.profile.save()
     
     return code
+
+
+def crop_to_circle(image_path, output_path):
+    """
+    Crops an image to a circle and saves it to output_path.
+    Requires Pillow (PIL) library.
+    """
+    try:
+        from PIL import Image, ImageDraw, ImageOps
+        import os
+        
+        img = Image.open(image_path).convert("RGBA")
+        
+        # Create a circular mask
+        mask = Image.new('L', img.size, 0)
+        draw = ImageDraw.Draw(mask)
+        draw.ellipse((0, 0) + img.size, fill=255)
+        
+        # Apply the mask
+        result = ImageOps.fit(img, mask.size, centering=(0.5, 0.5))
+        result.putalpha(mask)
+        
+        # Save
+        result.save(output_path)
+        logger.info(f"Successfully created rounded image at {output_path}")
+        return True
+    except Exception as e:
+        logger.error(f"Error cropping image to circle: {e}")
+        return False

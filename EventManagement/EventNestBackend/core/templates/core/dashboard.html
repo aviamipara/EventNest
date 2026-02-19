@@ -35,6 +35,7 @@
                                         <th>Guests</th>
                                         <th>Budget</th>
                                         <th>Status</th>
+                                        <th>Ticket</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -67,6 +68,16 @@
                                             <span class="badge bg-warning text-dark">Pending</span>
                                             {% endif %}
                                         </td>
+                                        <td>
+                                            {% if booking.status == 'Confirmed' %}
+                                            <a href="{% url 'view_ticket' 'booking' booking.id %}"
+                                                class="btn btn-sm btn-outline-ocean rounded-pill">
+                                                <i class="fas fa-ticket-alt"></i> View
+                                            </a>
+                                            {% else %}
+                                            <span class="text-muted small">-</span>
+                                            {% endif %}
+                                        </td>
                                     </tr>
                                     {% empty %}
                                     <tr>
@@ -95,6 +106,7 @@
                                         <th>Date</th>
                                         <th>Est. Cost</th>
                                         <th>Status</th>
+                                        <th>Ticket</th>
                                         <th>Location</th>
                                     </tr>
                                 </thead>
@@ -113,6 +125,16 @@
                                             <span class="badge bg-danger">Rejected</span>
                                             {% else %}
                                             <span class="badge bg-warning text-dark">Pending</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if event.status == 'Confirmed' %}
+                                            <a href="{% url 'view_ticket' 'custom' event.id %}"
+                                                class="btn btn-sm btn-outline-ocean rounded-pill">
+                                                <i class="fas fa-ticket-alt"></i> View
+                                            </a>
+                                            {% else %}
+                                            <span class="text-muted small">-</span>
                                             {% endif %}
                                         </td>
                                         <td>{{event.location }}</td>
